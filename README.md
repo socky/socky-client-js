@@ -1,4 +1,4 @@
-Socky push server JavaScript client
+Socky - browser JS files
 ==========
 
 Socky is push server for Ruby based on WebSockets. It allows you to break border between your application and client browser by letting the server initialize a connection and push data to the client.
