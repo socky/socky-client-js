@@ -1,7 +1,7 @@
 /**
  * Socky push-server JavaScript client
  *
- * @version 0.4.0
+ * @version 0.4.1
  * @author  Bernard Potocki <bernard.potocki@imanel.org>
  * @license The MIT license.
  * @source  http://github.com/socky/socky-js
