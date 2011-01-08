@@ -5,7 +5,27 @@ Socky is push server for Ruby based on WebSockets. It allows you to break border
 
 ### Usage
 
-Please see [wiki](https://github.com/socky/socky-js/wiki).
+One of most important points when creating Socky was to keep Javascripts simple and easy to customize. Thanks to that you can easily overwrite default approach and write your own.
+
+Socky defines his own class, and all calls between server and client are handled by prototyped functions. Some of them you could easily overwrite, and some of them should be modified carefully. In most situations you should only modify "respond_to_message" function. Lets look how to do that.
+
+Default definition is:
+
+    Socky.prototype.respond_to_message = function(msg) {
+      eval(msg);
+    };
+
+but you could overwrite it with anything you like. For example, if you are creating simple chat when all messages will be posted to div, and you need no other functionality, then(assuming you are using jQuery) you could write it like that:
+
+    Socky.prototype.respond_to_message = function(msg) {
+      $('#chat').append(msg);
+    };
+
+Thanks to that all you will need to write in your application is:
+
+    Socky.send("message")
+
+and it will be written to chat.
 
 ### Building
 
@@ -13,7 +33,7 @@ Please see [wiki](https://github.com/socky/socky-js/wiki).
     cd socky-js
     make
 
-### License 
+### License
 
 (The MIT License)
 
