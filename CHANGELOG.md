@@ -1,6 +1,13 @@
 Changelog
 =========
 
+## Edge
+
+- new features:
+  - load json and flash fallback only when needed
+- bugfixes:
+  - prevent starting connection before all assets are loaded
+
 ## 0.4.1 / 2010-11-04
 
 - new features:

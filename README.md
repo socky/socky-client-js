@@ -27,12 +27,6 @@ Thanks to that all you will need to write in your application is:
 
 and it will be written to chat.
 
-### Building
-
-    git clone git://github.com/socky/socky-js.git socky-js --recursive
-    cd socky-js
-    make
-
 ### License
 
 (The MIT License)
