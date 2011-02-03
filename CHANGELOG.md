@@ -1,7 +1,7 @@
 Changelog
 =========
 
-## Edge
+## 0.4.2 / 2011-02-03
 
 - new features:
   - load json and flash fallback only when needed
