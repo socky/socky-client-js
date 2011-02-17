@@ -1,3 +1,6 @@
-[submodule "vendor/web-socket-js"]
-	path = vendor/web-socket-js
+[submodule "src/web-socket-js"]
+	path = src/web-socket-js
 	url = git://github.com/gimite/web-socket-js.git
+[submodule "src/json"]
+	path = src/json
+	url = git://github.com/douglascrockford/JSON-js.git

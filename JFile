@@ -1,0 +1,44 @@
+# JBundle configuration file
+# https://github.com/ismasan/jbundle
+
+target_dir './dist'
+
+src_dir './src'
+
+version '0.4.2'
+
+bundle 'socky.js' do
+  license 'socky-licence.js'
+  file 'socky.js'
+  file 'dependencies.js'
+end
+
+bundle 'assets/flashfallback.js' do
+  license 'web-socket-js-licence.js'
+  file 'web-socket-js/swfobject.js'
+  file 'web-socket-js/FABridge.js'
+  file 'web-socket-js/web_socket.js'
+end
+
+bundle 'assets/json2.js' do
+  license 'json-licence.js'
+  file 'json/json2.js'
+end
+
+# Just copy this file across
+file 'web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
+
+# Runs for every bundle and license source.
+filter do |src, config|
+  src.gsub(/<VERSION>/, config.version.to_s)
+end
+
+# some_dependency.js
+filter :src do |src, config|
+  src.gsub /<DEPENDENCY_SUFFIX>/, ''
+end
+
+# some_dependency.min.js
+filter :min do |src, config|
+  src.gsub /<DEPENDENCY_SUFFIX>/, '.min'
+end
