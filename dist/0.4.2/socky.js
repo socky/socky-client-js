@@ -6,6 +6,7 @@
  * @licence The MIT licence.
  * @source  http://github.com/socky/socky-js
  */
+
 // Asset location for Socky(flash fallback and JSON files)
 window.SOCKY_ASSET_LOCATION = 'http://js.socky.org/v0.4/assets';
 
