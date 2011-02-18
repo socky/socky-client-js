@@ -1,3 +1,72 @@
+var Socky = function(options) {
+  this.options = options || {};
+
+  this.app_name = this.options.app_name || "";
+  this.host = this.options.host || window.location.hostname;
+  this.port = this.options.port || 8080;
+  this.secure = this.options.secure || false;
+
+  this.connected = false;
+  this.connection_id = null;
+
+  if(Socky.isReady){ this.connect(); }
+  Socky.instances.push(this);
+};
+
+Socky.websocket_path = '/socket/';
+Socky.isReady = false;
+Socky.instances = [];
+Socky.log = function(msg){ console.log(msg); };
+
+Socky.ready = function () {
+  Socky.isReady = true;
+  var i = 0;
+  for(i = 0; i < Socky.instances.length; i++) {
+    if(!Socky.instances[i].connected){ Socky.instances[i].connect(); }
+  }
+};
+
+Socky.prototype = {
+  connect: function() {
+    var url = 'ws';
+    if (this.secure) { url += "s"; }
+    url += "://" + this.host + ":" + this.port + Socky.websocket_path + this.app_name;
+
+    var self = this;
+
+    if('WebSocket' in window) {
+      Socky.log('Socky : connecting : ' + url );
+
+      var ws = new WebSocket(url);
+
+      ws.onopen = function() {
+        self.onopen.apply(self, arguments);
+      };
+      ws.onmessage = function() {
+        self.onmessage.apply(self, arguments);
+      };
+      ws.onclose = function() {
+        self.onclose.apply(self, arguments);
+      };
+
+      this.connection = ws;
+    } else {
+      Socky.log('Socky : WebSocket unavailable');
+      this.connection = {};
+    }
+  },
+  onopen: function() {
+    Socky.log('Socky : connected');
+  },
+  onmessage: function(evt) {
+    Socky.log('Socky : received message : ' + evt.data);
+  },
+  onclose: function() {
+    Socky.log('Socky : disconnected');
+  }
+};
+
+
 // // Asset location for Socky(flash fallback and JSON files)
 // window.SOCKY_ASSET_LOCATION = 'http://js.socky.org/v0.4/assets';
 //
