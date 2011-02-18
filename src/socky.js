@@ -16,11 +16,18 @@ var Socky = function(options) {
 Socky.websocket_path = '/socket/';
 Socky.isReady = false;
 Socky.instances = [];
-Socky.log = function(msg){ console.log(msg); };
+Socky.log = function() {
+  if(console && console.log) {
+    var log_params = ['Socky'];
+    var i;
+    for (i = 0; i < arguments.length; i++) { log_params.push(arguments[i]); }
+    console.log(log_params.join(' : '));
+  }
+};
 
 Socky.ready = function () {
   Socky.isReady = true;
-  var i = 0;
+  var i;
   for(i = 0; i < Socky.instances.length; i++) {
     if(!Socky.instances[i].connected){ Socky.instances[i].connect(); }
   }
@@ -34,8 +41,8 @@ Socky.prototype = {
 
     var self = this;
 
-    if('WebSocket' in window) {
-      Socky.log('Socky : connecting : ' + url );
+    if(window.WebSocket) {
+      Socky.log('connecting', url);
 
       var ws = new WebSocket(url);
 
@@ -51,18 +58,18 @@ Socky.prototype = {
 
       this.connection = ws;
     } else {
-      Socky.log('Socky : WebSocket unavailable');
+      Socky.log('WebSocket unavailable');
       this.connection = {};
     }
   },
   onopen: function() {
-    Socky.log('Socky : connected');
+    Socky.log('connected');
   },
   onmessage: function(evt) {
-    Socky.log('Socky : received message : ' + evt.data);
+    Socky.log('received message', evt.data);
   },
   onclose: function() {
-    Socky.log('Socky : disconnected');
+    Socky.log('disconnected');
   }
 };
 
