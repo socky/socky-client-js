@@ -35,8 +35,8 @@ end
 
 # some_dependency.js
 filter :src do |src, config|
-  src.gsub /<DEPENDENCY_SUFFIX>/, ''
-  src.gsub /<CDN_LOCATION>/, 'http://js.socky.org/v0.4/socky.min.js'
+  src.gsub! /<DEPENDENCY_SUFFIX>/, ''
+  src.gsub! /<CDN_LOCATION>/, 'http://js.socky.org/v0.5/socky.min.js'
 end
 
 # some_dependency.min.js

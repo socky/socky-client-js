@@ -1,10 +1,83 @@
+/*!
+ * Socky JavaScript Library
+ *
+ * @version 0.5.0-pre
+ * @author  Bernard Potocki <bernard.potocki@imanel.org>
+ * @licence The MIT licence.
+ * @source  http://github.com/socky/socky-js
+ */
+
+if(typeof Function.prototype.scopedTo == 'undefined'){
+  Function.prototype.scopedTo = function(context, args){
+    var f = this;
+    return function(){
+      return f.apply(context, Array.prototype.slice.call(args || [])
+        .concat(Array.prototype.slice.call(arguments)));
+    };
+  };
+};
+var Socky = function(options) {
+  this.options = options || {};
+
+  this.connected = false;
+  this.connection_id = null;
+
+  if (SockyManager.is_driver_loaded()) {
+    this.connect();
+  }
+
+  SockyManager.add_socky_instance.push(this);
+};
+
+Socky.prototype = {
+
+  connect: function() {
+
+    var self = this;
+
+    if (window.WebSocket) {
+
+      var url = SockyManager.websocket_url();
+
+      Socky.log('connecting', url);
+
+      var ws = new WebSocket(url);
+      ws.onopen = function() {
+        self.onopen.apply(self, arguments);
+      };
+      ws.onmessage = function() {
+        self.onmessage.apply(self, arguments);
+      };
+      ws.onclose = function() {
+        self.onclose.apply(self, arguments);
+      };
+
+      this._connection = ws;
+
+    } else {
+
+      Socky.log('WebSocket unavailable');
+      this._connection = {};
+
+    }
+  },
+  onopen: function() {
+    Socky.log('connected');
+  },
+  onmessage: function(evt) {
+    Socky.log('received message', evt.data);
+  },
+  onclose: function() {
+    Socky.log('disconnected');
+  }
+};
 var SockyManager = {
 
   // private attributes
   _is_websocket_driver_loaded: false,
   _socky_instances: [],
   _default_options: {
-    assets_location: '<CDN_LOCATION>',
+    assets_location: 'http://js.socky.org/v0.5/socky.min.js',
     app_name: "",
     websocket_debug: false,
     websocket_path: '/socket',
@@ -54,7 +127,7 @@ var SockyManager = {
 
     // Check for JSON dependency
     if (window['JSON'] == undefined) {
-      scripts_to_require.push(SockyManager._options.assets_location + '/json2<DEPENDENCY_SUFFIX>.js');
+      scripts_to_require.push(SockyManager._options.assets_location + '/json2.js');
     }
 
     var success_callback = null;
@@ -67,7 +140,7 @@ var SockyManager = {
       window.WEB_SOCKET_SWF_LOCATION = SockyManager._options.assets_location + "/WebSocketMain.swf";
       window.WEB_SOCKET_DEBUG = SockyManager._options.websocket_debug;
 
-      scripts_to_require.push(SockyManager._options.assets_location + '/flashfallback<DEPENDENCY_SUFFIX>.js');
+      scripts_to_require.push(SockyManager._options.assets_location + '/flashfallback.js');
 
       success_callback = function() {
 
@@ -167,7 +240,7 @@ var SockyManager = {
   Please, include this script into your application code to initialize Socky.
 
   SockyManager.init({
-    assets_location: '<CDN_LOCATION>',
+    assets_location: 'http://js.socky.org/v0.5/socky.min.js',
     app_name: "your_app_name",
     websocket_debug: false,
     websocket_path: '/socket',
