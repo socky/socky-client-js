@@ -38,7 +38,7 @@ var SockyManager = {
     url += "://" + host + ":" + path + "/" + app_name;
 
     return url;
-  }
+  },
 
   init: function(options) {
 
@@ -93,7 +93,7 @@ var SockyManager = {
     } else {
       success_callback();
     }
-  }
+  },
 
   // private methods
 
