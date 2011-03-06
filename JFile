@@ -10,7 +10,7 @@ version '0.5.0-pre'
 bundle 'socky.js' do
   license 'socky-licence.js'
   file 'socky.js'
-  file 'dependencies.js'
+  file 'socky-manager.js'
 end
 
 bundle 'assets/flashfallback.js' do
@@ -36,6 +36,7 @@ end
 # some_dependency.js
 filter :src do |src, config|
   src.gsub /<DEPENDENCY_SUFFIX>/, ''
+  src.gsub /<CDN_LOCATION>/, 'http://js.socky.org/v0.4/socky.min.js'
 end
 
 # some_dependency.min.js
