@@ -7,10 +7,13 @@ src_dir './src'
 version '0.5.0-pre'
 
 bundle 'socky.js' do
+  license 'class-license.js'
+  file 'class.js'
   license 'socky-licence.js'
-  file 'scoped-to.js'
   file 'socky.js'
   file 'socky-manager.js'
+  file 'channels.js'
+  file 'utils.js'
 end
 
 bundle 'assets/flashfallback.js' do
