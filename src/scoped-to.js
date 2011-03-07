@@ -1,5 +1,5 @@
-if(typeof Function.prototype.scopedTo == 'undefined'){
-  Function.prototype.scopedTo = function(context, args){
+if(typeof Function.prototype.scoped_to == 'undefined'){
+  Function.prototype.scoped_to = function(context, args){
     var f = this;
     return function(){
       return f.apply(context, Array.prototype.slice.call(args || [])

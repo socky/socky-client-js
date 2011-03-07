@@ -1,55 +1,47 @@
 var Socky = function(options) {
   this.options = options || {};
 
-  this.connected = false;
-  this.connection_id = null;
+  this._is_connected = false;
+  this._connection_id = null;
 
   if (SockyManager.is_driver_loaded()) {
     this.connect();
   }
 
-  SockyManager.add_socky_instance.push(this);
+  SockyManager.add_socky_instance(this);
 };
 
 Socky.prototype = {
 
-  connect: function() {
+  is_connected: function() {
+    return this._is_connected;
+  },
 
+  connect: function() {
     var self = this;
 
     if (window.WebSocket) {
-
       var url = SockyManager.websocket_url();
-
-      Socky.log('connecting', url);
-
-      var ws = new WebSocket(url);
-      ws.onopen = function() {
-        self.onopen.apply(self, arguments);
-      };
-      ws.onmessage = function() {
-        self.onmessage.apply(self, arguments);
-      };
-      ws.onclose = function() {
-        self.onclose.apply(self, arguments);
-      };
-
-      this._connection = ws;
-
+      this.log('connecting', url);
+      this._connection = new WebSocket(url);
+      this._connection.onopen = this.on_socket_open.scoped_to(this);
+      this._connection.onmessage = this.on_socket_message.scoped_to(this);
+      this._connection.onclose = this.on_socket_close.scoped_to(this);
     } else {
-
       Socky.log('WebSocket unavailable');
       this._connection = {};
-
     }
   },
-  onopen: function() {
-    Socky.log('connected');
+  on_socket_open: function() {
+    this.log('connected');
   },
-  onmessage: function(evt) {
-    Socky.log('received message', evt.data);
+  on_socket_message: function(evt) {
+    this.log('received message', evt.data);
   },
-  onclose: function() {
-    Socky.log('disconnected');
+  on_socket_close: function() {
+    this.log('disconnected');
+  },
+  log: function() {
+    SockyManager.log.apply(SockyManager, arguments);
   }
 };

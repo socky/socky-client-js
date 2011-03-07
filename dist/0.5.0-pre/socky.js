@@ -7,8 +7,8 @@
  * @source  http://github.com/socky/socky-js
  */
 
-if(typeof Function.prototype.scopedTo == 'undefined'){
-  Function.prototype.scopedTo = function(context, args){
+if(typeof Function.prototype.scoped_to == 'undefined'){
+  Function.prototype.scoped_to = function(context, args){
     var f = this;
     return function(){
       return f.apply(context, Array.prototype.slice.call(args || [])
@@ -19,56 +19,48 @@ if(typeof Function.prototype.scopedTo == 'undefined'){
 var Socky = function(options) {
   this.options = options || {};
 
-  this.connected = false;
-  this.connection_id = null;
+  this._is_connected = false;
+  this._connection_id = null;
 
   if (SockyManager.is_driver_loaded()) {
     this.connect();
   }
 
-  SockyManager.add_socky_instance.push(this);
+  SockyManager.add_socky_instance(this);
 };
 
 Socky.prototype = {
 
-  connect: function() {
+  is_connected: function() {
+    return this._is_connected;
+  },
 
+  connect: function() {
     var self = this;
 
     if (window.WebSocket) {
-
       var url = SockyManager.websocket_url();
-
-      Socky.log('connecting', url);
-
-      var ws = new WebSocket(url);
-      ws.onopen = function() {
-        self.onopen.apply(self, arguments);
-      };
-      ws.onmessage = function() {
-        self.onmessage.apply(self, arguments);
-      };
-      ws.onclose = function() {
-        self.onclose.apply(self, arguments);
-      };
-
-      this._connection = ws;
-
+      this.log('connecting', url);
+      this._connection = new WebSocket(url);
+      this._connection.onopen = this.on_socket_open.scoped_to(this);
+      this._connection.onmessage = this.on_socket_message.scoped_to(this);
+      this._connection.onclose = this.on_socket_close.scoped_to(this);
     } else {
-
       Socky.log('WebSocket unavailable');
       this._connection = {};
-
     }
   },
-  onopen: function() {
-    Socky.log('connected');
+  on_socket_open: function() {
+    this.log('connected');
   },
-  onmessage: function(evt) {
-    Socky.log('received message', evt.data);
+  on_socket_message: function(evt) {
+    this.log('received message', evt.data);
   },
-  onclose: function() {
-    Socky.log('disconnected');
+  on_socket_close: function() {
+    this.log('disconnected');
+  },
+  log: function() {
+    SockyManager.log.apply(SockyManager, arguments);
   }
 };
 var SockyManager = {
@@ -99,76 +91,59 @@ var SockyManager = {
   },
 
   is_driver_loaded: function() {
-    return SockyManager._is_websocket_driver_loaded;
+    return this._is_websocket_driver_loaded;
   },
 
   add_socky_instance: function(socky) {
-    SockyManager._socky_instances.push(socky);
+    this._socky_instances.push(socky);
   },
 
   websocket_url: function() {
     var url = 'ws';
-    if (SockyManager._options.websocket_secure) {
+    if (this._options.websocket_secure) {
       url += "s";
     }
-    url += "://" + SockyManager._options.websocket_host + ":" + SockyManager._options.websocket_port + SockyManager._options.websocket_path + "/" + SockyManager._options.app_name;
+    url += "://" + this._options.websocket_host + ":" + this._options.websocket_port + this._options.websocket_path + "/" + this._options.app_name;
 
     return url;
   },
 
   init: function(options) {
 
-    SockyManager._options = SockyManager._default_options;
+    this.log("inited");
+
+    this._options = this._default_options;
     for (option in options) {
-      SockyManager._options[option] = options[option];
+      this._options[option] = options[option];
     }
 
     var scripts_to_require = [];
 
+    var success_callback = function() {
+      this.log("Websockets driver loaded");
+      this._web_sockets_loaded();
+    }.scoped_to(this);
+
     // Check for JSON dependency
     if (window['JSON'] == undefined) {
-      scripts_to_require.push(SockyManager._options.assets_location + '/json2.js');
+      this.log("no JSON support, requiring it");
+      scripts_to_require.push(this._options.assets_location + '/json2.js');
     }
-
-    var success_callback = null;
 
     // Check for Flash fallback dep. Wrap initialization.
     if (window['WebSocket'] == undefined) {
 
+      this.log("no WebSocket driver available, requiring it");
+
       // Don't let WebSockets.js initialize on load. Inconsistent accross browsers.
-      window.WEB_SOCKET_DISABLE_AUTO_INITIALIZATION = true;
-      window.WEB_SOCKET_SWF_LOCATION = SockyManager._options.assets_location + "/WebSocketMain.swf";
-      window.WEB_SOCKET_DEBUG = SockyManager._options.websocket_debug;
+      window.WEB_SOCKET_SWF_LOCATION = this._options.assets_location + "/WebSocketMain.swf";
+      window.WEB_SOCKET_DEBUG = this._options.websocket_debug;
 
-      scripts_to_require.push(SockyManager._options.assets_location + '/flashfallback.js');
-
-      success_callback = function() {
-
-        FABridge.addInitializationCallback('webSocket', function() {
-          SockyManager._web_sockets_loaded();
-        });
-
-        // Run this AFTER adding the callback above
-        if (window['WebSocket']) {
-          // This will call the FABridge callback, which initializes Socky!
-          WebSocket.__initialize();
-        } else {
-          // Flash is not installed
-          SockyManager.log("Could not connect", "WebSocket is not availabe natively nor via Flash");
-        }
-
-      }
-
-    } else {
-
-      success_callback = function() {
-        SockyManager._web_sockets_loaded();
-      };
-
+      scripts_to_require.push(this._options.assets_location + '/flashfallback.js');
     }
 
     if (scripts_to_require.length > 0){
-      _require(scripts_to_require, callback);
+      this._require_scripts(scripts_to_require, success_callback);
     } else {
       success_callback();
     }
@@ -177,9 +152,9 @@ var SockyManager = {
   // private methods
 
   _web_sockets_loaded: function() {
-    SockyManager._is_websocket_driver_loaded = true;
-    for (var i = 0; i < Socky.instances.length; i++) {
-      var socky = SockyManager._socky_instances[i];
+    this._is_websocket_driver_loaded = true;
+    for (var i = 0; i < this._socky_instances.length; i++) {
+      var socky = this._socky_instances[i];
       if (!socky.is_connected()) {
         socky.connect();
       }
@@ -187,8 +162,8 @@ var SockyManager = {
   },
 
   _require_scripts: function(scripts, callback) {
-    var scriptsCount = 0;
 
+    var scripts_count = 0;
     var handle_script_loaded;
 
     if (document.addEventListener) {
@@ -205,15 +180,16 @@ var SockyManager = {
       }
     }
 
-    function check_if_ready(callback) {
+    var check_if_ready = function(callback) {
       scripts_count++;
       if (scripts.length == scripts_count) {
         // Opera needs the timeout for page initialization weirdness
+        this.log("All the require script have been loaded!");
         setTimeout(callback, 0);
       }
-    }
+    }.scoped_to(this);
 
-    function add_script(src, callback) {
+    var add_script = function(src, callback) {
       callback = callback || function() {}
       var head = document.getElementsByTagName('head')[0];
       var script = document.createElement('script');
@@ -221,12 +197,14 @@ var SockyManager = {
       script.setAttribute('type', 'text/javascript');
       script.setAttribute('async', true);
 
+      this.log("Adding script", src);
+
       handle_script_loaded(script, function() {
         check_if_ready(callback);
       });
 
       head.appendChild(script);
-    }
+    }.scoped_to(this);
 
     for (var i = 0; i < scripts.length; i++) {
       add_script(scripts[i], callback);
@@ -239,7 +217,7 @@ var SockyManager = {
 
   Please, include this script into your application code to initialize Socky.
 
-  SockyManager.init({
+  this.init({
     assets_location: 'http://js.socky.org/v0.5/socky.min.js',
     app_name: "your_app_name",
     websocket_debug: false,

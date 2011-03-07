@@ -2,7 +2,6 @@
 # https://github.com/ismasan/jbundle
 
 target_dir './dist'
-
 src_dir './src'
 
 version '0.5.0-pre'
@@ -30,13 +29,13 @@ file 'web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
 
 # Runs for every bundle and license source.
 filter do |src, config|
-  src.gsub(/<VERSION>/, config.version.to_s)
+  src.gsub /<VERSION>/, config.version.to_s
 end
 
 # some_dependency.js
 filter :src do |src, config|
-  src.gsub! /<DEPENDENCY_SUFFIX>/, ''
-  src.gsub! /<CDN_LOCATION>/, 'http://js.socky.org/v0.5/socky.min.js'
+  src = src.gsub /<DEPENDENCY_SUFFIX>/, ''
+  src = src.gsub /<CDN_LOCATION>/, 'http://js.socky.org/v0.5/socky.min.js'
 end
 
 # some_dependency.min.js
