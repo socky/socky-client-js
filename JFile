@@ -7,9 +7,9 @@ src_dir './src'
 version '0.5.0-pre'
 
 bundle 'socky.js' do
+  license 'socky-licence.js'
   license 'class-license.js'
   file 'class.js'
-  license 'socky-licence.js'
   file 'socky.js'
   file 'socky-manager.js'
   file 'channels.js'
@@ -17,6 +17,7 @@ bundle 'socky.js' do
 end
 
 bundle 'assets/flashfallback.js' do
+  license 'socky-licence.js'
   license 'web-socket-js-licence.js'
   file 'web-socket-js/swfobject.js'
   file 'web-socket-js/web_socket.js'

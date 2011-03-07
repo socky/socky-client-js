@@ -6,7 +6,8 @@
  * @author  Stefano Verna <stefano.verna@welaika.com>
  * @licence The MIT licence.
  * @source  http://github.com/socky/socky-js
- *
+ */
+/*!
  * This library contains code with the following licences:
  *
  * web_socket.js:

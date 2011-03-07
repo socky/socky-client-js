@@ -1,8 +1,3 @@
-/* Simple JavaScript Inheritance
- * By John Resig http://ejohn.org/
- * MIT Licensed.
- */
-// Inspired by base2 and Prototype
 /*!
  * Socky JavaScript Library
  *
@@ -11,6 +6,13 @@
  * @author  Stefano Verna <stefano.verna@welaika.com>
  * @licence The MIT licence.
  * @source  http://github.com/socky/socky-js
+ */
+/*!
+ * Simple JavaScript Inheritance
+ * By John Resig http://ejohn.org/
+ * MIT Licensed.
+ *
+ * Inspired by base2 and Prototype
  */
 
 (function(){
