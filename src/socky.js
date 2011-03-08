@@ -19,7 +19,6 @@ Socky = Events.extend({
     }
 
     this.bind('socky:connection_established', Socky.Utils.bind(this._on_connection_established, this));
-    this.bind('pusher:connection_established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
@@ -79,7 +78,12 @@ Socky = Events.extend({
       params.data = Socky.Utils.parseJSON(params.data);
     }
 
-    this.trigger(params.event, params.data);
+    if (params.channel) {
+      this._channels.find(params.channel).trigger(params.event, params.data);
+    } else {
+      this.trigger(params.event, params.data);
+    }
+
   },
 
   on_socket_close: function() {
@@ -109,6 +113,7 @@ Socky = Events.extend({
   },
 
   send: function(payload) {
+    Socky.Utils.log("sending message", JSON.stringify(payload));
     this._connection.send(JSON.stringify(payload));
     return this;
   },
@@ -116,7 +121,7 @@ Socky = Events.extend({
   // private methods
 
   _on_connection_established: function(data) {
-    Socky.Utils.log("connection_id", data.socket_id);
+    Socky.Utils.log("connection_id", data.connection_id);
     this._connection_id = data.connection_id;
     this._is_connected = true
     this._subscribe_pending_channels();
