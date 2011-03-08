@@ -7,17 +7,13 @@
     <title>Untitled Page</title>
     <script src="../dist/0.5.0-pre/socky.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf-8">
-      SockyManager.init({
-        assets_location: '../dist/0.5.0-pre/assets',
-        app_name: "",
-        websocket_debug: false,
-        websocket_path: '/socket',
-        websocket_host: "0.0.0.0",
-        websocket_port: 8080,
-        websocket_secure: false
+      Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
+      var socky = new Socky({
+        host: 'ws.pusherapp.com',
+        port: 80,
+        path: '/app/f5076aa8b251873b0c87/?client=js&version=1.8.0'
       });
-
-      socky = new Socky();
+      socky.subscribe("private-channel1");
     </script>
   </head>
   <body>

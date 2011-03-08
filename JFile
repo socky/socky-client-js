@@ -10,10 +10,12 @@ bundle 'socky.js' do
   license 'class-license.js'
   file 'class.js'
   license 'socky-licence.js'
+  file 'events.js'
   file 'socky.js'
-  file 'socky-manager.js'
-  file 'channels.js'
   file 'utils.js'
+  file 'channels-collection.js'
+  file 'channels.js'
+  file 'socky-manager.js'
 end
 
 bundle 'assets/flashfallback.js' do

@@ -1,21 +1,28 @@
-var SockyManager = {
+Socky.Manager = {
 
   // private attributes
+  _is_inited: false,
   _is_websocket_driver_loaded: false,
+  _jsonp_auth_callbacks: {},
   _socky_instances: [],
+  _assets_location: '<CDN_LOCATION>',
+  _flash_debug: false,
   _default_options: {
-    assets_location: '<CDN_LOCATION>',
     app_name: "",
-    websocket_debug: false,
-    websocket_path: '/websocket',
-    websocket_host: window.location.hostname,
-    websocket_port: 8080,
-    websocket_secure: false,
+    debug: false,
+    path: '/websocket',
+    host: window.location.hostname,
+    port: 8080,
+    secure: false,
     channel_auth_endpoint: "/socky/auth",
     channel_auth_transport: "ajax"
   },
 
   // public methods
+
+  is_inited: function() {
+    return this._is_inited;
+  },
 
   is_driver_loaded: function() {
     return this._is_websocket_driver_loaded;
@@ -25,21 +32,31 @@ var SockyManager = {
     this._socky_instances.push(socky);
   },
 
-  websocket_url: function() {
-    var url = 'ws';
-    if (this._options.websocket_secure) {
-      url += "s";
-    }
-    url += "://" + this._options.websocket_host + ":" + this._options.websocket_port + this._options.websocket_path + "/" + this._options.app_name;
-
-    return url;
+  default_options: function() {
+    return this._default_options;
   },
 
-  init: function(options) {
+  set_default_options: function(default_options) {
+    this._default_options = Socky.Utils.extend({}, this._default_options, default_options);
+  },
+
+  set_assets_location: function(assets) {
+    this._assets_location = assets;
+  },
+
+  set_flash_debug: function(debug) {
+    this._flash_debug = debug;
+  },
+
+  init: function() {
+
+    if (this._is_inited) {
+      return;
+    }
+
+    this._is_inited = true;
 
     Socky.Utils.log("inited");
-
-    this._options = Socky.Utils.extend({}, this._default_options, options);
 
     var scripts_to_require = [];
 
@@ -51,7 +68,7 @@ var SockyManager = {
     // Check for JSON dependency
     if (window['JSON'] == undefined) {
       Socky.Utils.log("no JSON support, requiring it");
-      scripts_to_require.push(this._options.assets_location + '/json2<DEPENDENCY_SUFFIX>.js');
+      scripts_to_require.push(this._assets_location + '/json2<DEPENDENCY_SUFFIX>.js');
     }
 
     // Check for Flash fallback dep. Wrap initialization.
@@ -60,10 +77,10 @@ var SockyManager = {
       Socky.Utils.log("no WebSocket driver available, requiring it");
 
       // Don't let WebSockets.js initialize on load. Inconsistent accross browsers.
-      window.WEB_SOCKET_SWF_LOCATION = this._options.assets_location + "/WebSocketMain.swf";
-      window.WEB_SOCKET_DEBUG = this._options.websocket_debug;
+      window.WEB_SOCKET_SWF_LOCATION = this._assets_location + "/WebSocketMain.swf";
+      window.WEB_SOCKET_DEBUG = this._flash_debug;
 
-      scripts_to_require.push(this._options.assets_location + '/flashfallback<DEPENDENCY_SUFFIX>.js');
+      scripts_to_require.push(this._assets_location + '/flashfallback<DEPENDENCY_SUFFIX>.js');
     }
 
     if (scripts_to_require.length > 0){
@@ -77,12 +94,11 @@ var SockyManager = {
 
   _web_sockets_loaded: function() {
     this._is_websocket_driver_loaded = true;
-    for (var i = 0; i < this._socky_instances.length; i++) {
-      var socky = this._socky_instances[i];
+    Socky.Utils.each(this._socky_instances, function(socky) {
       if (!socky.is_connected()) {
         socky.connect();
       }
-    }
+    });
   },
 
   _require_scripts: function(scripts, callback) {
@@ -136,21 +152,3 @@ var SockyManager = {
   }
 
 };
-
-/*
-
-  Please, include this script into your application code to initialize Socky.
-
-  this.init({
-    assets_location: '/path_to_assets',
-    app_name: "your_app_name",
-    websocket_debug: false,
-    websocket_path: '/websocket',
-    websocket_host: "your-host.com",
-    websocket_port: 8080,
-    websocket_secure: false,
-    channel_auth_endpoint: "/socky/auth",
-    channel_auth_transport: "ajax"
-  });
-
-*/

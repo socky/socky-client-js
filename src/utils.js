@@ -1,4 +1,5 @@
 Socky.Utils = {
+  breaker: {},
   log: function() {
     if (console && console.log) {
       var params = ['Socky'];
@@ -17,15 +18,33 @@ Socky.Utils = {
       obj.forEach(iterator, context);
     } else if (Socky.Utils.is_number(obj.length)) {
       for (var i = 0, l = obj.length; i < l; i++) {
-        if (iterator.call(context, obj[i], i, obj) === breaker) return;
+        if (iterator.call(context, obj[i], i, obj) === Socky.Utils.breaker) return;
       }
     } else {
       for (var key in obj) {
         if (hasOwnProperty.call(obj, key)) {
-          if (iterator.call(context, obj[key], key, obj) === breaker) return;
+          if (iterator.call(context, obj[key], key, obj) === Socky.Utils.breaker) return;
         }
       }
     }
+  },
+  find: function(obj, iterator, context) {
+    var result;
+    Socky.Utils.any(obj, function(value, index, list) {
+      if (iterator.call(context, value, index, list)) {
+        result = value;
+        return true;
+      }
+    });
+    return result;
+  },
+  any: function(obj, iterator, context) {
+    var result = false;
+    if (obj == null) return result;
+    Socky.Utils.each(obj, function(value, index, list) {
+      if (result = iterator.call(context, value, index, list)) return Socky.Utils.breaker;
+    });
+    return result;
   },
   extend: function(obj) {
     Socky.Utils.each(Array.prototype.slice.call(arguments, 1), function(source) {
@@ -44,7 +63,7 @@ Socky.Utils = {
     try {
       return JSON.parse(data);
     } catch(e) {
-      Socky.Utils.log("data attribute not valid JSON", "you may wish to implement your own SockyManger.parseJSON");
+      Socky.Utils.log("data attribute not valid JSON", "you may wish to implement your own Socky.Manager.parseJSON");
       return data;
     }
   }
