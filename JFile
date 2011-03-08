@@ -10,7 +10,6 @@ bundle 'socky.js' do
   license 'socky-licence.js'
   license 'class-license.js'
   file 'class.js'
-  license 'socky-licence.js'
   file 'events.js'
   file 'socky.js'
   file 'utils.js'

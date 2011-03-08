@@ -5,7 +5,7 @@ Socky.Manager = {
   _is_websocket_driver_loaded: false,
   _jsonp_auth_callbacks: {},
   _socky_instances: [],
-  _assets_location: '<CDN_LOCATION>',
+  _assets_location: '<ASSETS_LOCATION>',
   _flash_debug: false,
   _default_options: {
     app_name: "",

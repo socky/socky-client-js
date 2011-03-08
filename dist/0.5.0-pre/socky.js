@@ -15,15 +15,6 @@
  * Inspired by base2 and Prototype
  */
 
-/*!
- * Socky JavaScript Library
- *
- * @version 0.5.0-pre
- * @author  Bernard Potocki <bernard.potocki@imanel.org>
- * @author  Stefano Verna <stefano.verna@welaika.com>
- * @licence The MIT licence.
- * @source  http://github.com/socky/socky-js
- */
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
@@ -407,7 +398,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('pusher_internal:subscription_successful', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.bind('socky_internal:subscription_successful', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){
@@ -513,7 +504,7 @@ Socky.Manager = {
   _is_websocket_driver_loaded: false,
   _jsonp_auth_callbacks: {},
   _socky_instances: [],
-  _assets_location: '<CDN_LOCATION>',
+  _assets_location: 'http://js.socky.org/v0.5/assets',
   _flash_debug: false,
   _default_options: {
     app_name: "",
