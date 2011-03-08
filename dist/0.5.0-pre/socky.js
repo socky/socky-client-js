@@ -212,9 +212,9 @@ Socky = Events.extend({
     }
 
     if (params.channel) {
-      this._channels.find(params.channel).trigger(params.event, params.data);
+      this._channels.find(params.channel).trigger(params.event, params);
     } else {
-      this.trigger(params.event, params.data);
+      this.trigger(params.event, params);
     }
 
   },
