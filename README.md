@@ -7,17 +7,21 @@ Socky is push server for Ruby based on WebSockets. It allows you to break border
 
 Please, include this script into your application code to initialize Socky.
 
-    SockyManager.init({
-      assets_location: '/path_to_assets',
-      app_name: "your_app_name",
-      websocket_debug: false,
-      websocket_path: '/websocket',
-      websocket_host: "your-host.com",
-      websocket_port: 8080,
-      websocket_secure: false,
-      channel_auth_endpoint: "/socky/auth",
-      channel_auth_transport: "ajax"
+    // optional, will use the CDN version of the assets as default behaviour
+    Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
+
+    // optional, you can just setup the options inside each Socky object
+    Socky.Manager.set_default_options({
+      host: 'ws.my_host.com',
+      port: 80
     });
+
+    // any provided option will override the Socky.Manager default options
+    var socky = new Socky({
+      host: 'ws.another_host.com',
+    });
+
+    socky.subscribe("channel1");
 
 ### License
 
