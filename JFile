@@ -14,7 +14,9 @@ bundle 'socky.js' do
   file 'socky.js'
   file 'utils.js'
   file 'channels-collection.js'
-  file 'channels.js'
+  file 'channel.js'
+  file 'private-channel.js'
+  file 'presence-channel.js'
   file 'socky-manager.js'
 end
 

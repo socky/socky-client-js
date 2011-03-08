@@ -80,39 +80,39 @@ Socky = Events.extend({
 
     if (params.channel) {
       this._channels.find(params.channel).trigger(params.event, params);
-    } else {
-      this.trigger(params.event, params);
     }
 
+    this.trigger(params.event, params);
   },
 
   on_socket_close: function() {
     this.log('disconnected');
+    this._is_connected = false;
   },
 
   log: function() {
     Socky.Utils.log.apply(Socky.Manager, arguments);
   },
 
-  subscribe: function(channel_name) {
+  subscribe: function(channel_name, additional_data) {
     var channel = this._channels.add(channel_name);
     if (this._is_connected) {
-      channel.subscribe();
+      channel.subscribe(additional_data);
     }
   },
 
   unsubscribe: function(channel_name) {
-    Socky.Utils.each(channels, function(channel) {
-      this._channels.remove(channel);
-    });
-    if (this._is_connected) {
-      this.send_event('socky:unsubscribe', {
-        channels: channel
-      });
+    var channel = this._channels.find(channel_name);
+    if (channel) {
+      if (this._is_connected) {
+        channel.unsubscribe();
+      }
+      this._channels.remove(channel_name);
     }
   },
 
   send: function(payload) {
+    payload.connection_id = this._connection_id;
     Socky.Utils.log("sending message", JSON.stringify(payload));
     this._connection.send(JSON.stringify(payload));
     return this;

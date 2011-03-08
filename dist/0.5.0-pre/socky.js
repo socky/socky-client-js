@@ -213,39 +213,39 @@ Socky = Events.extend({
 
     if (params.channel) {
       this._channels.find(params.channel).trigger(params.event, params);
-    } else {
-      this.trigger(params.event, params);
     }
 
+    this.trigger(params.event, params);
   },
 
   on_socket_close: function() {
     this.log('disconnected');
+    this._is_connected = false;
   },
 
   log: function() {
     Socky.Utils.log.apply(Socky.Manager, arguments);
   },
 
-  subscribe: function(channel_name) {
+  subscribe: function(channel_name, additional_data) {
     var channel = this._channels.add(channel_name);
     if (this._is_connected) {
-      channel.subscribe();
+      channel.subscribe(additional_data);
     }
   },
 
   unsubscribe: function(channel_name) {
-    Socky.Utils.each(channels, function(channel) {
-      this._channels.remove(channel);
-    });
-    if (this._is_connected) {
-      this.send_event('socky:unsubscribe', {
-        channels: channel
-      });
+    var channel = this._channels.find(channel_name);
+    if (channel) {
+      if (this._is_connected) {
+        channel.unsubscribe();
+      }
+      this._channels.remove(channel_name);
     }
   },
 
   send: function(payload) {
+    payload.connection_id = this._connection_id;
     Socky.Utils.log("sending message", JSON.stringify(payload));
     this._connection.send(JSON.stringify(payload));
     return this;
@@ -404,7 +404,6 @@ Socky.Channel = Events.extend({
   disconnect: function(){
   },
 
-  // Activate after successful subscription. Called on top-level socky:subscription_succeeded
   acknowledge_subscription: function(data){
     this._subscribed = true;
   },
@@ -413,7 +412,11 @@ Socky.Channel = Events.extend({
     return false;
   },
 
-  subscribe: function() {
+  is_presence: function(){
+    return false;
+  },
+
+  subscribe: function(additional_data) {
     if (this._started_subscribe) {
       return;
     }
@@ -421,17 +424,25 @@ Socky.Channel = Events.extend({
     var self = this;
     this.authorize(function(data) {
       self._auth = data.auth;
-      self._socky.send({
-        event: 'socky:subscribe',
-        channel: self._name,
-        auth: self._auth
-      });
+      self.send_event('socky:subscribe', this.is_presence() ? {data: additional_data} : null);
     });
+  },
+
+  unsubscribe: function() {
+    this.send_event('socky:unsubscribe');
   },
 
   authorize: function(callback){
     // normal channels don't require auth
     callback({});
+  },
+
+  send_event: function(event_name, payload) {
+    payload = payload || {};
+    payload.event = event_name;
+    payload.channel = this._name;
+    payload.auth = this._auth;
+    this._socky.send(payload);
   }
 
 });
@@ -496,6 +507,45 @@ Socky.PrivateChannel = Socky.Channel.extend({
   }
 
 });
+Socky.PresenceChannel = Socky.PrivateChannel.extend({
+
+  init: function(channel_name, socky) {
+    this._super(channel_name, socky);
+    this._members = {};
+    this.bind('socky_internal:member_added', Socky.Utils.bind(this.on_member_added, this));
+    this.bind('socky_internal:member_removed', Socky.Utils.bind(this.on_member_added, this));
+  },
+
+  disconnect: function(){
+    this._members = {};
+  },
+
+  is_presence: function() {
+    return true;
+  },
+
+  acknowledge_subscription: function(data) {
+    this._super(data);
+    this._members = data.members;
+  },
+
+  on_member_added: function(data) {
+    this._members[data.connection_id] = data.data;
+    this.trigger('socky:member_added', data.data);
+  },
+
+  on_member_removed: function(data) {
+    var member = this._members[data.connection_id];
+    delete this._members[data.connection_id];
+    this.trigger('socky:member_removed', member);
+  },
+
+  members: function() {
+    return this._members;
+  }
+
+});
+
 
 Socky.Manager = {
 
