@@ -1,8 +1,3 @@
-/* Simple JavaScript Inheritance
- * By John Resig http://ejohn.org/
- * MIT Licensed.
- */
-// Inspired by base2 and Prototype
 /*!
  * Socky JavaScript Library
  *
@@ -12,7 +7,23 @@
  * @licence The MIT licence.
  * @source  http://github.com/socky/socky-js
  */
+/*!
+ * Simple JavaScript Inheritance
+ * By John Resig http://ejohn.org/
+ * MIT Licensed.
+ *
+ * Inspired by base2 and Prototype
+ */
 
+/*!
+ * Socky JavaScript Library
+ *
+ * @version 0.5.0-pre
+ * @author  Bernard Potocki <bernard.potocki@imanel.org>
+ * @author  Stefano Verna <stefano.verna@welaika.com>
+ * @licence The MIT licence.
+ * @source  http://github.com/socky/socky-js
+ */
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
@@ -71,6 +82,7 @@
     return Class;
   };
 })();
+
 Events = Class.extend({
 
   // Bind an event, specified by a string name, `ev`, to a `callback` function.
@@ -149,7 +161,6 @@ Socky = Events.extend({
     }
 
     this.bind('socky:connection_established', Socky.Utils.bind(this._on_connection_established, this));
-    this.bind('pusher:connection_established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
@@ -265,6 +276,7 @@ Socky = Events.extend({
   }
 
 });
+
 Socky.Utils = {
   breaker: {},
   log: function() {
@@ -335,6 +347,7 @@ Socky.Utils = {
     }
   }
 };
+
 Socky.ChannelsCollection = Class.extend({
 
   each: function(iterator) {
@@ -418,7 +431,7 @@ Socky.Channel = Events.extend({
     this.authorize(function(data) {
       self._auth = data.auth;
       self._socky.send({
-        event: 'pusher:subscribe',
+        event: 'socky:subscribe',
         channel: self._name,
         auth: self._auth
       });
@@ -500,7 +513,7 @@ Socky.Manager = {
   _is_websocket_driver_loaded: false,
   _jsonp_auth_callbacks: {},
   _socky_instances: [],
-  _assets_location: 'http://js.socky.org/v0.5/socky.min.js',
+  _assets_location: '<CDN_LOCATION>',
   _flash_debug: false,
   _default_options: {
     app_name: "",

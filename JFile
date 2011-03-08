@@ -7,6 +7,7 @@ src_dir './src'
 version '0.5.0-pre'
 
 bundle 'socky.js' do
+  license 'socky-licence.js'
   license 'class-license.js'
   file 'class.js'
   license 'socky-licence.js'
@@ -19,6 +20,7 @@ bundle 'socky.js' do
 end
 
 bundle 'assets/flashfallback.js' do
+  license 'socky-licence.js'
   license 'web-socket-js-licence.js'
   file 'web-socket-js/swfobject.js'
   file 'web-socket-js/web_socket.js'
@@ -34,13 +36,13 @@ file 'web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
 
 # Runs for every bundle and license source.
 filter do |src, config|
-  src.gsub /<VERSION>/, config.version.to_s
+  src = src.gsub /<VERSION>/, config.version.to_s
+  src = src.gsub /<ASSETS_LOCATION>/, 'http://js.socky.org/v0.5/assets'
 end
 
 # some_dependency.js
 filter :src do |src, config|
-  src = src.gsub /<DEPENDENCY_SUFFIX>/, ''
-  src = src.gsub /<CDN_LOCATION>/, 'http://js.socky.org/v0.5/socky.min.js'
+  src.gsub /<DEPENDENCY_SUFFIX>/, ''
 end
 
 # some_dependency.min.js
