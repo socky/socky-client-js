@@ -9,9 +9,8 @@
     <script type="text/javascript" charset="utf-8">
       Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
       var socky = new Socky({
-        host: 'ws.pusherapp.com',
-        port: 80,
-        path: '/app/f5076aa8b251873b0c87/?client=js&version=1.8.0'
+        app_name: 'my_app',
+        port: 3001
       });
       socky.subscribe("channel1");
     </script>
