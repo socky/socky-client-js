@@ -73,6 +73,7 @@
     return Class;
   };
 })();
+
 Socky = Class.extend({
 
   init: function(options) {
@@ -176,6 +177,7 @@ Socky = Class.extend({
   }
 
 });
+
 var SockyManager = {
 
   // private attributes
@@ -315,23 +317,6 @@ var SockyManager = {
 
 };
 
-/*
-
-  Please, include this script into your application code to initialize Socky.
-
-  this.init({
-    assets_location: '/path_to_assets',
-    app_name: "your_app_name",
-    websocket_debug: false,
-    websocket_path: '/websocket',
-    websocket_host: "your-host.com",
-    websocket_port: 8080,
-    websocket_secure: false,
-    channel_auth_endpoint: "/socky/auth",
-    channel_auth_transport: "ajax"
-  });
-
-*/
 Socky.Channel = Class.extend({
   init: function(channel_name, socky) {
     this.socky = socky;
@@ -532,3 +517,4 @@ Socky.Utils = {
     }
   }
 };
+
