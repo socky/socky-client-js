@@ -4,7 +4,7 @@ var SockyManager = {
   _is_websocket_driver_loaded: false,
   _socky_instances: [],
   _default_options: {
-    assets_location: '<CDN_LOCATION>',
+    assets_location: '<ASSETS_LOCATION>',
     app_name: "",
     websocket_debug: false,
     websocket_path: '/websocket',

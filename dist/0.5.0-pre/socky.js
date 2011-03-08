@@ -182,7 +182,7 @@ var SockyManager = {
   _is_websocket_driver_loaded: false,
   _socky_instances: [],
   _default_options: {
-    assets_location: 'http://js.socky.org/v0.5/socky.min.js',
+    assets_location: 'http://js.socky.org/v0.5/assets',
     app_name: "",
     websocket_debug: false,
     websocket_path: '/websocket',
