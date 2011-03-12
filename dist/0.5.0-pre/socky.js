@@ -151,7 +151,7 @@ Socky = Events.extend({
       this.log('WebSocket driver still unavailable, waiting...');
     }
 
-    this.bind('socky:connection_established', Socky.Utils.bind(this._on_connection_established, this));
+    this.bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
@@ -398,7 +398,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('socky_internal:subscription_successful', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.bind('socky_internal:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){
@@ -531,13 +531,13 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
 
   on_member_added: function(data) {
     this._members[data.connection_id] = data.data;
-    this.trigger('socky:member_added', data.data);
+    this.trigger('socky:member:added', data.data);
   },
 
   on_member_removed: function(data) {
     var member = this._members[data.connection_id];
     delete this._members[data.connection_id];
-    this.trigger('socky:member_removed', member);
+    this.trigger('socky:member:removed', member);
   },
 
   members: function() {

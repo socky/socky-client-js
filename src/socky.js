@@ -18,7 +18,7 @@ Socky = Events.extend({
       this.log('WebSocket driver still unavailable, waiting...');
     }
 
-    this.bind('socky:connection_established', Socky.Utils.bind(this._on_connection_established, this));
+    this.bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
