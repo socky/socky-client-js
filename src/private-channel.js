@@ -37,7 +37,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
 
   authorize_via_jsonp: function(callback) {
 
-    var callback_name = this.name;
+    var callback_name = this._name;
     Socky.Manager._jsonp_auth_callbacks[callback_name] = callback;
 
     var payload = {
@@ -47,7 +47,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
     };
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
-    var script_url = Socky.Manager.channel_auth_endpoint();
+    var script_url = this._socky.channel_auth_endpoint();
     script_url += '?callback=' + encodeURIComponent(full_callback_name);
     script_url += '&payload=' + encodeURIComponent(JSON.stringify(payload));
 

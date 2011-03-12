@@ -99,6 +99,7 @@ Socky = Events.extend({
     if (this._is_connected) {
       channel.subscribe(additional_data);
     }
+    return channel;
   },
 
   unsubscribe: function(channel_name) {
