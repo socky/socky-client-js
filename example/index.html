@@ -14,7 +14,7 @@
         channel_auth_endpoint: 'http://localhost:3002/socky/auth',
         channel_auth_transport: 'jsonp'
       });
-      socky.subscribe("private-channel1");
+      socky.subscribe("presence-channel1", {some: 'data'});
     </script>
   </head>
   <body>

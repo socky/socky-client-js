@@ -22,6 +22,8 @@ Socky.ChannelsCollection = Class.extend({
         var channel = null;
         if (channel_name.indexOf("private-") === 0) {
           channel = new Socky.PrivateChannel(channel_name, this._socky);
+        } else if (channel_name.indexOf("presence-") === 0) {
+          channel = new Socky.PresenceChannel(channel_name, this._socky);
         } else {
           channel = new Socky.Channel(channel_name, this._socky);
         }
