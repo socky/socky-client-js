@@ -424,7 +424,7 @@ Socky.Channel = Events.extend({
     var self = this;
     this.authorize(function(data) {
       self._auth = data.auth;
-      self.send_event('socky:subscribe', this.is_presence() ? {data: additional_data} : null);
+      self.send_event('socky:subscribe', self.is_presence() ? {data: additional_data} : null);
     });
   },
 
