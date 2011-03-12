@@ -10,9 +10,11 @@
       Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
       var socky = new Socky({
         app_name: 'my_app',
-        port: 3001
+        port: 3001,
+        channel_auth_endpoint: 'http://localhost:3002/socky/auth',
+        channel_auth_transport: 'jsonp'
       });
-      socky.subscribe("channel1");
+      socky.subscribe("private-channel1");
     </script>
   </head>
   <body>
