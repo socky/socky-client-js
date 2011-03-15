@@ -30,7 +30,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var payload = {
       'event': 'socky:subscribe',
       'channel': this._name,
-      'connection_id': this._socky.connection_id()
+      'connection_id': this._socky.connection_id(),
+      'data': this._subscription_data
     };
     xhr.send(JSON.stringify(payload));
   },
@@ -43,7 +44,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var payload = {
       'event': 'socky:subscribe',
       'channel': this._name,
-      'connection_id': this._socky.connection_id()
+      'connection_id': this._socky.connection_id(),
+      'data': this._subscription_data
     };
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"

@@ -11,7 +11,7 @@ Socky.ChannelsCollection = Class.extend({
     this._channels = {};
   },
 
-  add: function(obj) {
+  add: function(obj, data) {
     var self = this;
     if (obj instanceof Socky.ChannelsCollection) {
       Socky.Utils.extend(this._channels, obj._channels);
@@ -23,7 +23,7 @@ Socky.ChannelsCollection = Class.extend({
         if (channel_name.indexOf("private-") === 0) {
           channel = new Socky.PrivateChannel(channel_name, this._socky);
         } else if (channel_name.indexOf("presence-") === 0) {
-          channel = new Socky.PresenceChannel(channel_name, this._socky);
+          channel = new Socky.PresenceChannel(channel_name, this._socky, data);
         } else {
           channel = new Socky.Channel(channel_name, this._socky);
         }

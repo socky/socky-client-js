@@ -228,9 +228,9 @@ Socky = Events.extend({
   },
 
   subscribe: function(channel_name, additional_data) {
-    var channel = this._channels.add(channel_name);
+    var channel = this._channels.add(channel_name, additional_data);
     if (this._is_connected) {
-      channel.subscribe(additional_data);
+      channel.subscribe();
     }
     return channel;
   },
@@ -353,7 +353,7 @@ Socky.ChannelsCollection = Class.extend({
     this._channels = {};
   },
 
-  add: function(obj) {
+  add: function(obj, data) {
     var self = this;
     if (obj instanceof Socky.ChannelsCollection) {
       Socky.Utils.extend(this._channels, obj._channels);
@@ -365,7 +365,7 @@ Socky.ChannelsCollection = Class.extend({
         if (channel_name.indexOf("private-") === 0) {
           channel = new Socky.PrivateChannel(channel_name, this._socky);
         } else if (channel_name.indexOf("presence-") === 0) {
-          channel = new Socky.PresenceChannel(channel_name, this._socky);
+          channel = new Socky.PresenceChannel(channel_name, this._socky, data);
         } else {
           channel = new Socky.Channel(channel_name, this._socky);
         }
@@ -495,7 +495,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var payload = {
       'event': 'socky:subscribe',
       'channel': this._name,
-      'connection_id': this._socky.connection_id()
+      'connection_id': this._socky.connection_id(),
+      'data': this._subscription_data
     };
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
@@ -512,9 +513,10 @@ Socky.PrivateChannel = Socky.Channel.extend({
 });
 Socky.PresenceChannel = Socky.PrivateChannel.extend({
 
-  init: function(channel_name, socky) {
+  init: function(channel_name, socky, data) {
     this._super(channel_name, socky);
     this._members = {};
+    this._subscription_data = data;
     this.bind('socky_internal:member_added', Socky.Utils.bind(this.on_member_added, this));
     this.bind('socky_internal:member_removed', Socky.Utils.bind(this.on_member_added, this));
   },
@@ -541,6 +543,10 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
     var member = this._members[data.connection_id];
     delete this._members[data.connection_id];
     this.trigger('socky:member:removed', member);
+  },
+
+  subscribe: function() {
+    this._super(this._subscription_data);
   },
 
   members: function() {

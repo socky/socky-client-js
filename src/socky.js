@@ -95,9 +95,9 @@ Socky = Events.extend({
   },
 
   subscribe: function(channel_name, additional_data) {
-    var channel = this._channels.add(channel_name);
+    var channel = this._channels.add(channel_name, additional_data);
     if (this._is_connected) {
-      channel.subscribe(additional_data);
+      channel.subscribe();
     }
     return channel;
   },
