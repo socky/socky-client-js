@@ -94,8 +94,8 @@ Socky = Events.extend({
     Socky.Utils.log.apply(Socky.Manager, arguments);
   },
 
-  subscribe: function(channel_name, additional_data) {
-    var channel = this._channels.add(channel_name, additional_data);
+  subscribe: function(channel_name, permissions, data) {
+    var channel = this._channels.add(channel_name, permissions, data);
     if (this._is_connected) {
       channel.subscribe();
     }

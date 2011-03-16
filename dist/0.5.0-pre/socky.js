@@ -227,8 +227,8 @@ Socky = Events.extend({
     Socky.Utils.log.apply(Socky.Manager, arguments);
   },
 
-  subscribe: function(channel_name, additional_data) {
-    var channel = this._channels.add(channel_name, additional_data);
+  subscribe: function(channel_name, permissions, data) {
+    var channel = this._channels.add(channel_name, permissions, data);
     if (this._is_connected) {
       channel.subscribe();
     }
@@ -353,7 +353,7 @@ Socky.ChannelsCollection = Class.extend({
     this._channels = {};
   },
 
-  add: function(obj, data) {
+  add: function(obj, permissions, data) {
     var self = this;
     if (obj instanceof Socky.ChannelsCollection) {
       Socky.Utils.extend(this._channels, obj._channels);
@@ -363,9 +363,9 @@ Socky.ChannelsCollection = Class.extend({
       if (!existing_channel) {
         var channel = null;
         if (channel_name.indexOf("private-") === 0) {
-          channel = new Socky.PrivateChannel(channel_name, this._socky);
+          channel = new Socky.PrivateChannel(channel_name, this._socky, permissions);
         } else if (channel_name.indexOf("presence-") === 0) {
-          channel = new Socky.PresenceChannel(channel_name, this._socky, data);
+          channel = new Socky.PresenceChannel(channel_name, this._socky, permissions, data);
         } else {
           channel = new Socky.Channel(channel_name, this._socky);
         }
@@ -419,7 +419,7 @@ Socky.Channel = Events.extend({
     return false;
   },
 
-  subscribe: function(additional_data) {
+  subscribe: function() {
     if (this._started_subscribe) {
       return;
     }
@@ -427,8 +427,12 @@ Socky.Channel = Events.extend({
     var self = this;
     this.authorize(function(data) {
       self._auth = data.auth;
-      self.send_event('socky:subscribe', self.is_presence() ? {data: additional_data} : null);
+      self.send_event('socky:subscribe', self.generate_subscription_payload());
     });
+  },
+
+  generate_subscription_payload: function() {
+    return null;
   },
 
   unsubscribe: function() {
@@ -452,6 +456,11 @@ Socky.Channel = Events.extend({
 
 Socky.PrivateChannel = Socky.Channel.extend({
 
+  init: function(channel_name, socky, permissions) {
+    this._super(channel_name, socky);
+    this._permissions = permissions;
+  },
+
   is_private: function(){
     return true;
   },
@@ -462,6 +471,27 @@ Socky.PrivateChannel = Socky.Channel.extend({
     } else {
       this.authorize_via_jsonp(callback);
     }
+  },
+
+  generate_subscription_payload: function() {
+    var payload = {};
+    if (this._permissions.read === false) {
+      payload.read = false;
+    }
+    if (this._permissions.write === true) {
+      payload.write = true;
+    }
+    return payload;
+  },
+
+  generate_auth_payload: function() {
+    var payload = {
+      'event': 'socky:subscribe',
+      'channel': this._name,
+      'connection_id': this._socky.connection_id()
+    };
+    Socky.Utils.extend(payload, this.generate_subscription_payload());
+    return payload;
   },
 
   authorize_via_ajax: function(callback){
@@ -479,11 +509,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
         }
       }
     };
-    var payload = {
-      'event': 'socky:subscribe',
-      'channel': this._name,
-      'connection_id': this._socky.connection_id()
-    };
+    var payload = this.generate_auth_payload();
     xhr.send(JSON.stringify(payload));
   },
 
@@ -492,12 +518,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var callback_name = this._name;
     Socky.Manager._jsonp_auth_callbacks[callback_name] = callback;
 
-    var payload = {
-      'event': 'socky:subscribe',
-      'channel': this._name,
-      'connection_id': this._socky.connection_id(),
-      'data': this._subscription_data
-    };
+    var payload = this.generate_auth_payload();
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
     var script_url = this._socky.channel_auth_endpoint();
@@ -513,8 +534,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
 });
 Socky.PresenceChannel = Socky.PrivateChannel.extend({
 
-  init: function(channel_name, socky, data) {
-    this._super(channel_name, socky);
+  init: function(channel_name, socky, permissions, data) {
+    this._super(channel_name, socky, permissions);
     this._members = {};
     this._subscription_data = data;
     this.bind('socky_internal:member_added', Socky.Utils.bind(this.on_member_added, this));
@@ -545,8 +566,13 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
     this.trigger('socky:member:removed', member);
   },
 
-  subscribe: function() {
-    this._super(this._subscription_data);
+  generate_subscription_payload: function() {
+    var payload = this._super();
+    if (this._permissions.hide === true) {
+      payload.hide = true;
+    }
+    payload.data = this._subscription_data;
+    return payload;
   },
 
   members: function() {

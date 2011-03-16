@@ -24,7 +24,7 @@ Socky.Channel = Events.extend({
     return false;
   },
 
-  subscribe: function(additional_data) {
+  subscribe: function() {
     if (this._started_subscribe) {
       return;
     }
@@ -32,8 +32,12 @@ Socky.Channel = Events.extend({
     var self = this;
     this.authorize(function(data) {
       self._auth = data.auth;
-      self.send_event('socky:subscribe', self.is_presence() ? {data: additional_data} : null);
+      self.send_event('socky:subscribe', self.generate_subscription_payload());
     });
+  },
+
+  generate_subscription_payload: function() {
+    return null;
   },
 
   unsubscribe: function() {
