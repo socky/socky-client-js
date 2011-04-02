@@ -48,4 +48,27 @@ $(document).ready(function() {
   });
   socky_public_subscribe_success.subscribe('public_subscribe_success');
   
+  //// Private channel
+  
+  // private_subscribe_success
+  var socky_private_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+  socky_private_subscribe_success.bind("socky:subscribe:success", function(payload) {
+    if(payload.channel == 'private-private_subscribe_success') {
+      pass('private_subscribe_success');
+      socky_private_subscribe_success.close();
+    };
+  });
+  socky_private_subscribe_success.subscribe('private-private_subscribe_success');
+  
+  //// Presence channel
+  
+  // presence_subscribe_success
+  var socky_presence_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+  socky_presence_subscribe_success.bind("socky:subscribe:success", function(payload) {
+    if(payload.channel == 'presence-presence_subscribe_success') {
+      pass('presence_subscribe_success');
+      socky_presence_subscribe_success.close();
+    };
+  });
+  socky_presence_subscribe_success.subscribe('presence-presence_subscribe_success');
 });
