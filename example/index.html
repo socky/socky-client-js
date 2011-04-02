@@ -5,22 +5,59 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title>Untitled Page</title>
+    <script src="http://code.jquery.com/jquery-1.5.2.js" type="text/javascript"></script>
     <script src="../dist/0.5.0-pre/socky.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf-8">
-      var socky = new Socky(
-        'ws://localhost:3001/websocket/my_app',
-        {
-          auth_endpoint: 'http://localhost:3002/socky/auth',
-          auth_transport: 'jsonp',
-          assets_location: '../dist/0.5.0-pre/assets'
-        }
-      );
-      socky.subscribe("presence-channel1", {write: true, hide: true}, {some: 'data'});
+      $(document).ready(function() {
+        var socky = new Socky(
+          'ws://localhost:3001/websocket/my_app',
+          {
+            auth_endpoint: 'http://localhost:3002/socky/auth',
+            auth_transport: 'jsonp',
+            assets_location: '../dist/0.5.0-pre/assets'
+          }
+        );
+        channel = socky.subscribe("private-chat-channel", {write: true});
+
+        socky.bind("socky:subscribe:success", function(payload) {
+          console.log("== socky:subscribe:success coming to socky: ", payload);
+        });
+
+        socky.bind("all", function(event, payload) {
+          console.log("== event coming to socky: " + event, payload);
+        });
+
+        channel.bind("all", function(event, data) {
+          console.log("== event coming to channel: " + event, data);
+        });
+
+        channel.bind("socky:subscribe:success", function(data) {
+          console.log("== socky:subscribe:success coming to channel: ", data);
+        });
+
+        channel.bind("chat_message", function(data) {
+          $("<li/>").text(data.message).appendTo("ul");
+        });
+
+        $("button").click(function() {
+          console.log({message: $("#message").val()});
+          channel.trigger("chat_message", {message: $("#message").val()});
+        })
+      });
     </script>
+    <style type="text/css" media="screen">
+      label,input,button {
+        display: block;
+      }
+    </style>
   </head>
   <body>
     <div>
       <h1>Socky Example</h1>
+      <ul class="messages"></ul>
+      <label for="message">Your Message:</label>
+      <input type="text" name="message" value="" id="message"/>
+      <button>Send message!</button>
     </div>
   </body>
 </html>

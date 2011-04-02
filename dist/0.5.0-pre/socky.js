@@ -75,13 +75,14 @@
   };
 
 
-var Events = Class.extend({
+Events = Class.extend({
 
   // Bind an event, specified by a string name, `ev`, to a `callback` function.
   // Passing `"all"` will bind the callback to all events fired.
-  bind : function(ev, callback) {
-    var calls = this._callbacks || (this._callbacks = {});
-    var list  = this._callbacks[ev] || (this._callbacks[ev] = []);
+  _bind : function(scope, ev, callback) {
+    this._callbacks = this._callbacks || {};
+    var calls = this._callbacks[scope] || (this._callbacks[scope] = {});
+    var list  = this._callbacks[scope][ev] || (this._callbacks[scope][ev] = []);
     list.push(callback);
     return this;
   },
@@ -89,11 +90,11 @@ var Events = Class.extend({
   // Remove one or many callbacks. If `callback` is null, removes all
   // callbacks for the event. If `ev` is null, removes all bound callbacks
   // for all events.
-  unbind : function(ev, callback) {
+  _unbind : function(scope, ev, callback) {
     var calls;
-    if (!ev) {
-      this._callbacks = {};
-    } else if (calls = this._callbacks) {
+    if (this._callbacks && !ev) {
+      this._callbacks[scope] = {};
+    } else if (calls = this._callbacks[scope]) {
       if (!callback) {
         calls[ev] = [];
       } else {
@@ -113,19 +114,19 @@ var Events = Class.extend({
   // Trigger an event, firing all bound callbacks. Callbacks are passed the
   // same arguments as `trigger` is, apart from the event name.
   // Listening for `"all"` passes the true event name as the first argument.
-  trigger : function(ev) {
+  _trigger : function(scope, ev) {
     var list, calls, i, l;
-    if (!(calls = this._callbacks)) return this;
+    if (!this._callbacks || !(calls = this._callbacks[scope])) return this;
     if (calls[ev]) {
       list = calls[ev].slice(0);
       for (i = 0, l = list.length; i < l; i++) {
-        list[i].apply(this, Array.prototype.slice.call(arguments, 1));
+        list[i].apply(this, Array.prototype.slice.call(arguments, 2));
       }
     }
     if (calls['all']) {
       list = calls['all'].slice(0);
       for (i = 0, l = list.length; i < l; i++) {
-        list[i].apply(this, arguments);
+        list[i].apply(this, Array.prototype.slice.call(arguments, 1));
       }
     }
     return this;
@@ -137,7 +138,7 @@ this.Socky = Events.extend({
   init: function(url, options) {
 
     if (!Socky.Manager.is_inited()) {
-      Socky.Manager.init(options);
+      Socky.Manager.init(options.assets_location);
     }
 
     this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options, {url: url});
@@ -152,7 +153,7 @@ this.Socky = Events.extend({
       this.log('WebSocket driver still unavailable, waiting...');
     }
 
-    this.bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
+    this.raw_event_bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
@@ -202,11 +203,17 @@ this.Socky = Events.extend({
       params.data = Socky.Utils.parseJSON(params.data);
     }
 
+    // first notify internal handlers
+    this._trigger('raw', params.event, params);
+
+    // notify the external (client) handlers
+    this._trigger('public', params.event, params);
+
     if (params.channel) {
-      this._channels.find(params.channel).trigger(params.event, params);
+      // then notify channels' internal handlers
+      this._channels.find(params.channel).receive_event(params.event, params);
     }
 
-    this.trigger(params.event, params);
   },
 
   on_socket_close: function() {
@@ -241,6 +248,22 @@ this.Socky = Events.extend({
     Socky.Utils.log("sending message", JSON.stringify(payload));
     this._connection.send(JSON.stringify(payload));
     return this;
+  },
+
+  raw_event_bind: function(event, callback) {
+    this._bind('raw', event, callback);
+  },
+
+  raw_event_unbind: function(event, callback) {
+    this._unbind('raw', event, callback);
+  },
+
+  bind: function(event, callback) {
+    this._bind('public', event, callback);
+  },
+
+  unbind: function(event, callback) {
+    this._unbind('public', event, callback);
   },
 
   // private methods
@@ -391,7 +414,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.raw_event_bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){
@@ -440,6 +463,34 @@ Socky.Channel = Events.extend({
     payload.channel = this._name;
     payload.auth = this._auth;
     this._socky.send(payload);
+  },
+
+  receive_event: function(event_name, payload) {
+    // first notify internal handlers
+    this._trigger('raw', payload.event, payload);
+
+    // finally notify the external (client) handlers, passing them just the 'data' param
+    this._trigger('public', payload.event, payload.data);
+  },
+
+  raw_event_bind: function(event, callback) {
+    this._bind('raw', event, callback);
+  },
+
+  raw_event_unbind: function(event, callback) {
+    this._unbind('raw', event, callback);
+  },
+
+  bind: function(event, callback) {
+    this._bind('public', event, callback);
+  },
+
+  unbind: function(event, callback) {
+    this._unbind('public', event, callback);
+  },
+
+  trigger: function(event, data) {
+    this.send_event(event, {data: data});
   }
 
 });

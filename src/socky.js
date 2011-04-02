@@ -3,7 +3,7 @@ this.Socky = Events.extend({
   init: function(url, options) {
 
     if (!Socky.Manager.is_inited()) {
-      Socky.Manager.init(options);
+      Socky.Manager.init(options.assets_location);
     }
 
     this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options, {url: url});
@@ -18,7 +18,7 @@ this.Socky = Events.extend({
       this.log('WebSocket driver still unavailable, waiting...');
     }
 
-    this.bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
+    this.raw_event_bind('socky:connection:established', Socky.Utils.bind(this._on_connection_established, this));
 
     Socky.Manager.add_socky_instance(this);
   },
@@ -68,11 +68,17 @@ this.Socky = Events.extend({
       params.data = Socky.Utils.parseJSON(params.data);
     }
 
+    // first notify internal handlers
+    this._trigger('raw', params.event, params);
+
+    // notify the external (client) handlers
+    this._trigger('public', params.event, params);
+
     if (params.channel) {
-      this._channels.find(params.channel).trigger(params.event, params);
+      // then notify channels' internal handlers
+      this._channels.find(params.channel).receive_event(params.event, params);
     }
 
-    this.trigger(params.event, params);
   },
 
   on_socket_close: function() {
@@ -107,6 +113,22 @@ this.Socky = Events.extend({
     Socky.Utils.log("sending message", JSON.stringify(payload));
     this._connection.send(JSON.stringify(payload));
     return this;
+  },
+
+  raw_event_bind: function(event, callback) {
+    this._bind('raw', event, callback);
+  },
+
+  raw_event_unbind: function(event, callback) {
+    this._unbind('raw', event, callback);
+  },
+
+  bind: function(event, callback) {
+    this._bind('public', event, callback);
+  },
+
+  unbind: function(event, callback) {
+    this._unbind('public', event, callback);
   },
 
   // private methods

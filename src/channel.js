@@ -6,7 +6,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.raw_event_bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){
@@ -55,6 +55,34 @@ Socky.Channel = Events.extend({
     payload.channel = this._name;
     payload.auth = this._auth;
     this._socky.send(payload);
+  },
+
+  receive_event: function(event_name, payload) {
+    // first notify internal handlers
+    this._trigger('raw', payload.event, payload);
+
+    // finally notify the external (client) handlers, passing them just the 'data' param
+    this._trigger('public', payload.event, payload.data);
+  },
+
+  raw_event_bind: function(event, callback) {
+    this._bind('raw', event, callback);
+  },
+
+  raw_event_unbind: function(event, callback) {
+    this._unbind('raw', event, callback);
+  },
+
+  bind: function(event, callback) {
+    this._bind('public', event, callback);
+  },
+
+  unbind: function(event, callback) {
+    this._unbind('public', event, callback);
+  },
+
+  trigger: function(event, data) {
+    this.send_event(event, {data: data});
   }
 
 });
