@@ -5,7 +5,10 @@ require 'socky/authenticator'
 map '/socky/auth' do
   app = proc do |env|
     request = Rack::Request.new(env)
-
+    
+    payload = JSON.parse(request.params['payload']) rescue {}
+    payload = {} unless payload.is_a?(Hash)
+    
     begin
       response = Socky::Authenticator.authenticate(request.params['payload'], true)
     rescue ArgumentError => e
