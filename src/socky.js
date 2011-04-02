@@ -76,7 +76,10 @@ this.Socky = Events.extend({
 
     if (params.channel) {
       // then notify channels' internal handlers
-      this._channels.find(params.channel).receive_event(params.event, params);
+      var channel = this.channel(params.channel);
+      if (channel) {
+        channel.receive_event(params.event, params);
+      }
     }
 
   },
@@ -99,7 +102,7 @@ this.Socky = Events.extend({
   },
 
   unsubscribe: function(channel_name) {
-    var channel = this._channels.find(channel_name);
+    var channel = this.channel(channel_name);
     if (channel) {
       if (this._is_connected) {
         channel.unsubscribe();
@@ -129,6 +132,10 @@ this.Socky = Events.extend({
 
   unbind: function(event, callback) {
     this._unbind('public', event, callback);
+  },
+
+  channel: function(channel_name) {
+    this._channels.find(channel_name);
   },
 
   // private methods
