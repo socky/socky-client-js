@@ -15,6 +15,7 @@
  * Inspired by base2 and Prototype
  */
 
+(function() {
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
@@ -401,7 +402,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('socky_internal:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){
@@ -538,8 +539,8 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
     this._super(channel_name, socky, permissions);
     this._members = {};
     this._subscription_data = data;
-    this.bind('socky_internal:member:added', Socky.Utils.bind(this.on_member_added, this));
-    this.bind('socky_internal:member:removed', Socky.Utils.bind(this.on_member_removed, this));
+    this.bind('socky:member:added', Socky.Utils.bind(this.on_member_added, this));
+    this.bind('socky:member:removed', Socky.Utils.bind(this.on_member_removed, this));
   },
 
   disconnect: function(){
@@ -737,3 +738,4 @@ Socky.Manager = {
 
 };
 
+})();

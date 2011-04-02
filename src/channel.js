@@ -6,7 +6,7 @@ Socky.Channel = Events.extend({
     this._global_callbacks = [];
     this._subscribed = false;
     this._auth = null;
-    this.bind('socky_internal:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
+    this.bind('socky:subscribe:success', Socky.Utils.bind(this.acknowledge_subscription, this));
   },
 
   disconnect: function(){

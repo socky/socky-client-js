@@ -9,6 +9,7 @@ version '0.5.0-pre'
 bundle 'socky.js' do
   license 'socky-licence.js'
   license 'class-license.js'
+  file 'lib-prefix.js'
   file 'class.js'
   file 'events.js'
   file 'socky.js'
@@ -18,6 +19,7 @@ bundle 'socky.js' do
   file 'private-channel.js'
   file 'presence-channel.js'
   file 'socky-manager.js'
+  file 'lib-suffix.js'
 end
 
 bundle 'assets/flashfallback.js' do
