@@ -1,12 +1,12 @@
-Socky = Events.extend({
+this.Socky = Events.extend({
 
-  init: function(options) {
+  init: function(url, options) {
 
     if (!Socky.Manager.is_inited()) {
-      Socky.Manager.init();
+      Socky.Manager.init(options);
     }
 
-    this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options);
+    this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options, {url: url});
     this._channels = new Socky.ChannelsCollection(this);
     this._is_connected = false;
     this._connection_id = null;
@@ -23,12 +23,12 @@ Socky = Events.extend({
     Socky.Manager.add_socky_instance(this);
   },
 
-  channel_auth_transport: function() {
-    return this._options.channel_auth_transport;
+  auth_transport: function() {
+    return this._options.auth_transport;
   },
 
-  channel_auth_endpoint: function() {
-    return this._options.channel_auth_endpoint;
+  auth_endpoint: function() {
+    return this._options.auth_endpoint;
   },
 
   connection_id: function() {
@@ -39,21 +39,11 @@ Socky = Events.extend({
     return this._is_connected;
   },
 
-  url: function() {
-    var url = 'ws';
-    if (this._options.secure) {
-      url += "s";
-    }
-    url += "://" + this._options.host + ":" + this._options.port + this._options.path + "/" + this._options.app_name;
-
-    return url;
-  },
-
   connect: function() {
     var self = this;
 
     if (window.WebSocket) {
-      var url = this.url();
+      var url = this._options.url;
       this.log('connecting', url);
       this._connection = new WebSocket(url);
       this._connection.onopen = Socky.Utils.bind(this.on_socket_open, this);

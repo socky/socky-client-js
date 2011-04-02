@@ -10,7 +10,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
   },
 
   authorize: function(callback){
-    if (this._socky.channel_auth_transport() == "ajax") {
+    if (this._socky.auth_transport() == "ajax") {
       this.authorize_via_ajax(callback);
     } else {
       this.authorize_via_jsonp(callback);
@@ -41,7 +41,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
   authorize_via_ajax: function(callback){
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xhr.open("POST", this._socky.channel_auth_endpoint(), true);
+    xhr.open("POST", this._socky.auth_endpoint(), true);
     xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
@@ -65,7 +65,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var payload = this.generate_auth_payload();
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
-    var script_url = this._socky.channel_auth_endpoint();
+    var script_url = this._socky.auth_endpoint();
     script_url += '?callback=' + encodeURIComponent(full_callback_name);
     script_url += '&payload=' + encodeURIComponent(JSON.stringify(payload));
 

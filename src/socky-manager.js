@@ -8,14 +8,10 @@ Socky.Manager = {
   _assets_location: '<ASSETS_LOCATION>',
   _flash_debug: false,
   _default_options: {
-    app_name: "",
     debug: false,
-    path: '/websocket',
-    host: window.location.hostname,
-    port: 8080,
-    secure: false,
-    channel_auth_endpoint: "/socky/auth",
-    channel_auth_transport: "ajax"
+    url: 'ws://'+window.location.hostname+':'+8080+'/websocket',
+    auth_endpoint: "/socky/auth",
+    auth_transport: "ajax"
   },
 
   // public methods
@@ -48,7 +44,7 @@ Socky.Manager = {
     this._flash_debug = debug;
   },
 
-  init: function() {
+  init: function(assets_location) {
 
     if (this._is_inited) {
       return;
@@ -57,6 +53,10 @@ Socky.Manager = {
     this._is_inited = true;
 
     Socky.Utils.log("inited");
+
+    if (assets_location) {
+      this.set_assets_location(assets_location);
+    }
 
     var scripts_to_require = [];
 

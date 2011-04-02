@@ -7,13 +7,14 @@
     <title>Untitled Page</title>
     <script src="../dist/0.5.0-pre/socky.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf-8">
-      Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
-      var socky = new Socky({
-        app_name: 'my_app',
-        port: 3001,
-        channel_auth_endpoint: 'http://localhost:3002/socky/auth',
-        channel_auth_transport: 'jsonp'
-      });
+      var socky = new Socky(
+        'ws://localhost:3001/websocket/my_app',
+        {
+          auth_endpoint: 'http://localhost:3002/socky/auth',
+          auth_transport: 'jsonp',
+          assets_location: '../dist/0.5.0-pre/assets'
+        }
+      );
       socky.subscribe("presence-channel1", {write: true, hide: true}, {some: 'data'});
     </script>
   </head>

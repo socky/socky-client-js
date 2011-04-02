@@ -1,4 +1,4 @@
-Events = Class.extend({
+var Events = Class.extend({
 
   // Bind an event, specified by a string name, `ev`, to a `callback` function.
   // Passing `"all"` will bind the callback to all events fired.

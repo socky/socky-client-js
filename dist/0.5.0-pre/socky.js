@@ -16,10 +16,10 @@
  */
 
 (function() {
-(function(){
+
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
-  this.Class = function(){};
+  var Class = function(){};
 
   // Create a new Class that inherits from this class
   Class.extend = function(prop) {
@@ -73,9 +73,9 @@
 
     return Class;
   };
-})();
 
-Events = Class.extend({
+
+var Events = Class.extend({
 
   // Bind an event, specified by a string name, `ev`, to a `callback` function.
   // Passing `"all"` will bind the callback to all events fired.
@@ -132,15 +132,15 @@ Events = Class.extend({
   }
 
 });
-Socky = Events.extend({
+this.Socky = Events.extend({
 
-  init: function(options) {
+  init: function(url, options) {
 
     if (!Socky.Manager.is_inited()) {
-      Socky.Manager.init();
+      Socky.Manager.init(options);
     }
 
-    this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options);
+    this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options, {url: url});
     this._channels = new Socky.ChannelsCollection(this);
     this._is_connected = false;
     this._connection_id = null;
@@ -157,12 +157,12 @@ Socky = Events.extend({
     Socky.Manager.add_socky_instance(this);
   },
 
-  channel_auth_transport: function() {
-    return this._options.channel_auth_transport;
+  auth_transport: function() {
+    return this._options.auth_transport;
   },
 
-  channel_auth_endpoint: function() {
-    return this._options.channel_auth_endpoint;
+  auth_endpoint: function() {
+    return this._options.auth_endpoint;
   },
 
   connection_id: function() {
@@ -173,21 +173,11 @@ Socky = Events.extend({
     return this._is_connected;
   },
 
-  url: function() {
-    var url = 'ws';
-    if (this._options.secure) {
-      url += "s";
-    }
-    url += "://" + this._options.host + ":" + this._options.port + this._options.path + "/" + this._options.app_name;
-
-    return url;
-  },
-
   connect: function() {
     var self = this;
 
     if (window.WebSocket) {
-      var url = this.url();
+      var url = this._options.url;
       this.log('connecting', url);
       this._connection = new WebSocket(url);
       this._connection.onopen = Socky.Utils.bind(this.on_socket_open, this);
@@ -269,7 +259,6 @@ Socky = Events.extend({
   }
 
 });
-
 Socky.Utils = {
   breaker: {},
   log: function() {
@@ -467,7 +456,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
   },
 
   authorize: function(callback){
-    if (this._socky.channel_auth_transport() == "ajax") {
+    if (this._socky.auth_transport() == "ajax") {
       this.authorize_via_ajax(callback);
     } else {
       this.authorize_via_jsonp(callback);
@@ -498,7 +487,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
   authorize_via_ajax: function(callback){
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xhr.open("POST", this._socky.channel_auth_endpoint(), true);
+    xhr.open("POST", this._socky.auth_endpoint(), true);
     xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
@@ -522,7 +511,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var payload = this.generate_auth_payload();
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
-    var script_url = this._socky.channel_auth_endpoint();
+    var script_url = this._socky.auth_endpoint();
     script_url += '?callback=' + encodeURIComponent(full_callback_name);
     script_url += '&payload=' + encodeURIComponent(JSON.stringify(payload));
 
@@ -593,14 +582,10 @@ Socky.Manager = {
   _assets_location: 'http://js.socky.org/v0.5/assets',
   _flash_debug: false,
   _default_options: {
-    app_name: "",
     debug: false,
-    path: '/websocket',
-    host: window.location.hostname,
-    port: 8080,
-    secure: false,
-    channel_auth_endpoint: "/socky/auth",
-    channel_auth_transport: "ajax"
+    url: 'ws://'+window.location.hostname+':'+8080+'/websocket',
+    auth_endpoint: "/socky/auth",
+    auth_transport: "ajax"
   },
 
   // public methods
@@ -633,7 +618,7 @@ Socky.Manager = {
     this._flash_debug = debug;
   },
 
-  init: function() {
+  init: function(assets_location) {
 
     if (this._is_inited) {
       return;
@@ -642,6 +627,10 @@ Socky.Manager = {
     this._is_inited = true;
 
     Socky.Utils.log("inited");
+
+    if (assets_location) {
+      this.set_assets_location(assets_location);
+    }
 
     var scripts_to_require = [];
 
