@@ -151,7 +151,7 @@ describe('Socky Private Channel', function () {
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
       socky.bind("socky:subscribe:success", callback);
-      socky.subscribe('private-test_channel', {read: true});
+      socky.subscribe('private-test_channel');
     });
 
     waitsFor(function() { return callback.wasCalled; }, 500);
@@ -171,7 +171,7 @@ describe('Socky Private Channel', function () {
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
       socky.bind("socky:subscribe:failure", callback);
-      socky.subscribe('private-invalid_channel', {read: true});
+      socky.subscribe('private-invalid_channel');
     });
 
     waitsFor(function() { return callback.wasCalled; }, 500);
@@ -194,7 +194,7 @@ describe('Socky Private Channel', function () {
       socky.bind("socky:subscribe:success", function() {
         socky.unsubscribe('private-test_channel');;
       })
-      socky.subscribe('private-test_channel', {read: true});
+      socky.subscribe('private-test_channel');
     });
 
     waitsFor(function() { return callback.wasCalled; }, 500);
@@ -214,7 +214,7 @@ describe('Socky Private Channel', function () {
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
       socky.bind("socky:unsubscribe:failure", callback);
-      socky.unsubscribe('private-test_channel', {read: true});
+      socky.unsubscribe('private-test_channel');
     });
 
     waitsFor(function() { return callback.wasCalled; }, 500);
