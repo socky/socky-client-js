@@ -30,10 +30,18 @@ Socky.Channel = Events.extend({
     }
     this._started_subscribe = true;
     var self = this;
-    this.authorize(function(data) {
-      self._auth = data.auth;
-      self.send_event('socky:subscribe', self.generate_subscription_payload());
-    });
+    this.authorize(
+      function(data) {
+        self._auth = data.auth;
+        self.send_event('socky:subscribe', self.generate_subscription_payload());
+      },
+      function(data) {
+        self._socky.send_locally({
+          event: 'socky:subscribe:failure',
+          channel: self._name
+        });
+      }
+    );
   },
 
   generate_subscription_payload: function() {

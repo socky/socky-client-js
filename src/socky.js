@@ -58,11 +58,9 @@ this.Socky = Events.extend({
         if (!this._connection_open) {
           this._connection = null;
           // simulate a remote event
-          this.on_socket_message({
-            data: {
-              event: 'socky:connection:error',
-              reason: 'down'
-            }
+          this.send_locally({
+            event: 'socky:connection:error',
+            reason: 'down'
           });
         }
       }, this), 2000);
@@ -110,6 +108,9 @@ this.Socky = Events.extend({
   on_socket_close: function() {
     this.log('disconnected');
     this._is_connected = false;
+    this.send_locally({
+      event: 'socky:connection:closed'
+    });
   },
 
   log: function() {
@@ -131,7 +132,18 @@ this.Socky = Events.extend({
         channel.unsubscribe();
       }
       this._channels.remove(channel_name);
+    } else {
+      this.send_locally({
+        event: 'socky:unsubscribe:failure',
+        channel: channel_name
+      });
     }
+  },
+
+  send_locally: function(payload) {
+    this.on_socket_message({
+      data: payload
+    });
   },
 
   send: function(payload) {

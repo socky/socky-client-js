@@ -193,11 +193,9 @@ this.Socky = Events.extend({
         if (!this._connection_open) {
           this._connection = null;
           // simulate a remote event
-          this.on_socket_message({
-            data: {
-              event: 'socky:connection:error',
-              reason: 'down'
-            }
+          this.send_locally({
+            event: 'socky:connection:error',
+            reason: 'down'
           });
         }
       }, this), 2000);
@@ -245,6 +243,9 @@ this.Socky = Events.extend({
   on_socket_close: function() {
     this.log('disconnected');
     this._is_connected = false;
+    this.send_locally({
+      event: 'socky:connection:closed'
+    });
   },
 
   log: function() {
@@ -266,7 +267,18 @@ this.Socky = Events.extend({
         channel.unsubscribe();
       }
       this._channels.remove(channel_name);
+    } else {
+      this.send_locally({
+        event: 'socky:unsubscribe:failure',
+        channel: channel_name
+      });
     }
+  },
+
+  send_locally: function(payload) {
+    this.on_socket_message({
+      data: payload
+    });
   },
 
   send: function(payload) {
@@ -472,10 +484,18 @@ Socky.Channel = Events.extend({
     }
     this._started_subscribe = true;
     var self = this;
-    this.authorize(function(data) {
-      self._auth = data.auth;
-      self.send_event('socky:subscribe', self.generate_subscription_payload());
-    });
+    this.authorize(
+      function(data) {
+        self._auth = data.auth;
+        self.send_event('socky:subscribe', self.generate_subscription_payload());
+      },
+      function(data) {
+        self._socky.send_locally({
+          event: 'socky:subscribe:failure',
+          channel: self._name
+        });
+      }
+    );
   },
 
   generate_subscription_payload: function() {
@@ -533,18 +553,23 @@ Socky.PrivateChannel = Socky.Channel.extend({
 
   init: function(channel_name, socky, permissions) {
     this._super(channel_name, socky);
-    this._permissions = permissions;
+    var default_permissions = {
+      read: true,
+      write: false,
+      presence: false
+    };
+    this._permissions = Socky.Utils.extend({}, default_permissions, permissions);
   },
 
   is_private: function(){
     return true;
   },
 
-  authorize: function(callback){
+  authorize: function(success_callback, failure_callback){
     if (this._socky.auth_transport() == "ajax") {
-      this.authorize_via_ajax(callback);
+      this.authorize_via_ajax(success_callback, failure_callback);
     } else {
-      this.authorize_via_jsonp(callback);
+      this.authorize_via_jsonp(success_callback, failure_callback);
     }
   },
 
@@ -569,7 +594,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
     return payload;
   },
 
-  authorize_via_ajax: function(callback){
+  authorize_via_ajax: function(success_callback, failure_callback){
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
     xhr.open("POST", this._socky.auth_endpoint(), true);
@@ -578,20 +603,27 @@ Socky.PrivateChannel = Socky.Channel.extend({
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
           var data = Socky.Utils.parseJSON(xhr.responseText);
-          callback(data);
+          success_callback(data);
         } else {
           Socky.Utils.log("Couldn't get auth info from your webapp", status);
+          failure_callback();
         }
+      } else {
+        failure_callback();
       }
     };
     var payload = this.generate_auth_payload();
     xhr.send(JSON.stringify(payload));
   },
 
-  authorize_via_jsonp: function(callback) {
+  authorize_via_jsonp: function(success_callback, failure_callback) {
 
     var callback_name = this._name;
-    Socky.Manager._jsonp_auth_callbacks[callback_name] = callback;
+    var success_called = false;
+    Socky.Manager._jsonp_auth_callbacks[callback_name] = function() {
+      success_called = true;
+      success_callback();
+    };
 
     var payload = this.generate_auth_payload();
 
@@ -603,7 +635,14 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var script = document.createElement("script");
     script.src = script_url;
     var head = document.getElementsByTagName("head")[0] || document.documentElement;
-    head.insertBefore( script, head.firstChild );
+    head.insertBefore(script, head.firstChild);
+
+    setTimeout(function() {
+      if (!success_called) {
+        failure_callback();
+      }
+    }, 3000);
+
   }
 
 });

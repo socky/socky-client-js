@@ -95,7 +95,7 @@ describe('Socky Public Channel', function () {
     });
 
   });
-  
+
   it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
 
     var callback;
@@ -118,8 +118,8 @@ describe('Socky Public Channel', function () {
     });
 
   });
-  
-  it('should receive a "socky:unsubscribe:failure" with a proper channel after try to unsubscribe from not subscribed channel', function() {
+
+  it('should receive a "socky:unsubscribe:failure" with a proper channel after tring to unsubscribe from not subscribed channel', function() {
 
     var callback;
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
@@ -162,7 +162,7 @@ describe('Socky Private Channel', function () {
     });
 
   });
-  
+
   it('should receive a "socky:subscribe:failure" with a proper channel if subscribe request was rejected', function() {
 
     var callback;
@@ -182,7 +182,7 @@ describe('Socky Private Channel', function () {
     });
 
   });
-  
+
   it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
 
     var callback;
@@ -205,7 +205,7 @@ describe('Socky Private Channel', function () {
     });
 
   });
-  
+
   it('should receive a "socky:unsubscribe:failure" with a proper channel after try to unsubscribe from not subscribed channel', function() {
 
     var callback;
