@@ -2,12 +2,18 @@ require 'rack'
 require 'json'
 require 'socky/authenticator'
 
+Socky::Authenticator.secret = 'my_secret'
+
 map '/socky/auth' do
   app = proc do |env|
     request = Rack::Request.new(env)
     
+    request.params['payload'] = request.env['rack.input'].read
+    
     payload = JSON.parse(request.params['payload']) rescue {}
     payload = {} unless payload.is_a?(Hash)
+    
+    return [ 400, {}, []] if payload['channel'].to_s.match(/invalid/)
     
     begin
       response = Socky::Authenticator.authenticate(request.params['payload'], true)

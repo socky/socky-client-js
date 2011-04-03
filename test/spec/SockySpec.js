@@ -1,4 +1,4 @@
-describe('Socky Object', function () {
+describe('Socky Connection', function () {
 
   it('should receive a "socky:connection:established" with a proper connection_id', function() {
 
@@ -68,38 +68,167 @@ describe('Socky Object', function () {
       socky.close();
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 5000);
+    waitsFor(function() { return callback.wasCalled; }, 500);
 
   });
 
+});
+
+describe('Socky Public Channel', function () {
+
+  it('should receive a "socky:subscribe:success" with a proper channel after subscribing', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:subscribe:success", callback);
+      socky.subscribe('test_channel');
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
+      socky.close();
+    });
+
+  });
+  
+  it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:unsubscribe:success", callback);
+      socky.bind("socky:subscribe:success", function() {
+        socky.unsubscribe('test_channel');;
+      })
+      socky.subscribe('test_channel');
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
+      socky.close();
+    });
+
+  });
+  
+  it('should receive a "socky:unsubscribe:failure" with a proper channel after try to unsubscribe from not subscribed channel', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:unsubscribe:failure", callback);
+      socky.unsubscribe('test_channel');
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
+      socky.close();
+    });
+
+  });
+
+});
+
+describe('Socky Private Channel', function () {
+
+  it('should receive a "socky:subscribe:success" with a proper channel after subscribing', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:subscribe:success", callback);
+      socky.subscribe('private-test_channel', {read: true});
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');
+      socky.close();
+    });
+
+  });
+  
+  it('should receive a "socky:subscribe:failure" with a proper channel if subscribe request was rejected', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:subscribe:failure", callback);
+      socky.subscribe('private-invalid_channel', {read: true});
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('private-invalid_channel');
+      socky.close();
+    });
+
+  });
+  
+  it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:unsubscribe:success", callback);
+      socky.bind("socky:subscribe:success", function() {
+        socky.unsubscribe('private-test_channel');;
+      })
+      socky.subscribe('private-test_channel', {read: true});
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');
+      socky.close();
+    });
+
+  });
+  
+  it('should receive a "socky:unsubscribe:failure" with a proper channel after try to unsubscribe from not subscribed channel', function() {
+
+    var callback;
+    var socky = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
+
+    runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:unsubscribe:failure", callback);
+      socky.unsubscribe('private-test_channel', {read: true});
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 500);
+
+    runs(function() {
+      expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');
+      socky.close();
+    });
+
+  });
 
 });
 
 /*$(document).ready(function() {
-
-    //// Public channel
-
-    // public_subscribe_success
-    var socky_public_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
-    socky_public_subscribe_success.bind("socky:subscribe:success", function(payload) {
-      if(payload.channel == 'public_subscribe_success') {
-        pass('public_subscribe_success');
-        socky_public_subscribe_success.close();
-      };
-    });
-    socky_public_subscribe_success.subscribe('public_subscribe_success');
-
-    //// Private channel
-
-    // private_subscribe_success
-    var socky_private_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-pre/assets'});
-    socky_private_subscribe_success.bind("socky:subscribe:success", function(payload) {
-      if(payload.channel == 'private-private_subscribe_success') {
-        pass('private_subscribe_success');
-        socky_private_subscribe_success.close();
-      };
-    });
-    socky_private_subscribe_success.subscribe('private-private_subscribe_success');
 
     //// Presence channel
 
