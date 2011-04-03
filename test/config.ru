@@ -23,6 +23,7 @@ map '/socky/auth' do
     end
   end
   
+  use Rack::CommonLogger
   run app
 end
 
