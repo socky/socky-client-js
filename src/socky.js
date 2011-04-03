@@ -63,7 +63,7 @@ this.Socky = Events.extend({
             reason: 'down'
           });
         }
-      }, this), 2000);
+      }, this), 10000);
     } else {
       this.log('WebSocket unavailable');
       this._connection = {};

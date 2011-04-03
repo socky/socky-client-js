@@ -54,7 +54,6 @@ Socky.PrivateChannel = Socky.Channel.extend({
           var data = Socky.Utils.parseJSON(xhr.responseText);
           success_callback(data);
         } else {
-          Socky.Utils.log("Couldn't get auth info from your webapp", status);
           failure_callback();
         }
       } else {
@@ -90,7 +89,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
       if (!success_called) {
         failure_callback();
       }
-    }, 3000);
+    }, 10000);
 
   }
 
