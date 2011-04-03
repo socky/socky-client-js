@@ -82,7 +82,7 @@ describe('Socky Public Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Subscribe success callback');
       socky.bind("socky:subscribe:success", callback);
       socky.subscribe('test_channel');
     });
@@ -102,7 +102,7 @@ describe('Socky Public Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Unsubscribe success callback');
       socky.bind("socky:unsubscribe:success", callback);
       socky.bind("socky:subscribe:success", function() {
         socky.unsubscribe('test_channel');;
@@ -125,7 +125,7 @@ describe('Socky Public Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Unsubscribe failure callback');
       socky.bind("socky:unsubscribe:failure", callback);
       socky.unsubscribe('test_channel');
     });
@@ -149,7 +149,7 @@ describe('Socky Private Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Subscribe success callback');
       socky.bind("socky:subscribe:success", callback);
       socky.subscribe('private-test_channel');
     });
@@ -169,7 +169,7 @@ describe('Socky Private Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Subscribe failure callback');
       socky.bind("socky:subscribe:failure", callback);
       socky.subscribe('private-invalid_channel');
     });
@@ -189,7 +189,7 @@ describe('Socky Private Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Unsubscribe success callback');
       socky.bind("socky:unsubscribe:success", callback);
       socky.bind("socky:subscribe:success", function() {
         socky.unsubscribe('private-test_channel');;
@@ -212,7 +212,7 @@ describe('Socky Private Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
-      callback = jasmine.createSpy('Connection established callback');
+      callback = jasmine.createSpy('Unsubscribe failure callback');
       socky.bind("socky:unsubscribe:failure", callback);
       socky.unsubscribe('private-test_channel');
     });
