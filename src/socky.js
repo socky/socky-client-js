@@ -60,13 +60,13 @@ this.Socky = Events.extend({
   },
 
   on_socket_message: function(evt) {
-    this.log('received message', evt.data);
-
     var params = Socky.Utils.parseJSON(evt.data);
 
     if (typeof(params.data) == 'string') {
       params.data = Socky.Utils.parseJSON(params.data);
     }
+
+    this.log('received message', params);
 
     // first notify internal handlers
     this._trigger('raw', params.event, params);
@@ -113,7 +113,7 @@ this.Socky = Events.extend({
 
   send: function(payload) {
     payload.connection_id = this._connection_id;
-    Socky.Utils.log("sending message", JSON.stringify(payload));
+    this.log("sending message", payload);
     this._connection.send(JSON.stringify(payload));
     return this;
   },
@@ -135,7 +135,7 @@ this.Socky = Events.extend({
   },
 
   channel: function(channel_name) {
-    this._channels.find(channel_name);
+    return this._channels.find(channel_name);
   },
 
   // private methods

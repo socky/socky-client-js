@@ -19,30 +19,14 @@
         );
         channel = socky.subscribe("private-chat-channel", {write: true});
 
-        socky.bind("socky:subscribe:success", function(payload) {
-          console.log("== socky:subscribe:success coming to socky: ", payload);
+        channel.bind("chat_message", function(message) {
+          $("<li/>").text(message).appendTo("ul");
         });
-
-        socky.bind("all", function(event, payload) {
-          console.log("== event coming to socky: " + event, payload);
-        });
-
-        channel.bind("all", function(event, data) {
-          console.log("== event coming to channel: " + event, data);
-        });
-
-        channel.bind("socky:subscribe:success", function(data) {
-          console.log("== socky:subscribe:success coming to channel: ", data);
-        });
-
-        channel.bind("chat_message", function(data) {
-          $("<li/>").text(data.message).appendTo("ul");
-        });
-
         $("button").click(function() {
           console.log({message: $("#message").val()});
-          channel.trigger("chat_message", {message: $("#message").val()});
-        })
+          channel.trigger("chat_message", $("#message").val());
+        });
+
       });
     </script>
     <style type="text/css" media="screen">

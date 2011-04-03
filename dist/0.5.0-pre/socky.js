@@ -195,13 +195,13 @@ this.Socky = Events.extend({
   },
 
   on_socket_message: function(evt) {
-    this.log('received message', evt.data);
-
     var params = Socky.Utils.parseJSON(evt.data);
 
     if (typeof(params.data) == 'string') {
       params.data = Socky.Utils.parseJSON(params.data);
     }
+
+    this.log('received message', params);
 
     // first notify internal handlers
     this._trigger('raw', params.event, params);
@@ -211,7 +211,10 @@ this.Socky = Events.extend({
 
     if (params.channel) {
       // then notify channels' internal handlers
-      this._channels.find(params.channel).receive_event(params.event, params);
+      var channel = this.channel(params.channel);
+      if (channel) {
+        channel.receive_event(params.event, params);
+      }
     }
 
   },
@@ -234,7 +237,7 @@ this.Socky = Events.extend({
   },
 
   unsubscribe: function(channel_name) {
-    var channel = this._channels.find(channel_name);
+    var channel = this.channel(channel_name);
     if (channel) {
       if (this._is_connected) {
         channel.unsubscribe();
@@ -245,7 +248,7 @@ this.Socky = Events.extend({
 
   send: function(payload) {
     payload.connection_id = this._connection_id;
-    Socky.Utils.log("sending message", JSON.stringify(payload));
+    this.log("sending message", payload);
     this._connection.send(JSON.stringify(payload));
     return this;
   },
@@ -264,6 +267,10 @@ this.Socky = Events.extend({
 
   unbind: function(event, callback) {
     this._unbind('public', event, callback);
+  },
+
+  channel: function(channel_name) {
+    return this._channels.find(channel_name);
   },
 
   // private methods
@@ -286,11 +293,9 @@ Socky.Utils = {
   breaker: {},
   log: function() {
     if (console && console.log) {
-      var params = ['Socky'];
-      for (var i = 0; i < arguments.length; i++) {
-        params.push(arguments[i]);
-      }
-      console.log(params.join(' : '));
+      var args = Array.prototype.slice.call(arguments);
+      args.unshift("Socky");
+      Function.prototype.apply.apply(console.log, [console, args]);
     }
   },
   is_number: function(obj) {

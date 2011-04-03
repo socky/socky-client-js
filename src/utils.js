@@ -2,11 +2,9 @@ Socky.Utils = {
   breaker: {},
   log: function() {
     if (console && console.log) {
-      var params = ['Socky'];
-      for (var i = 0; i < arguments.length; i++) {
-        params.push(arguments[i]);
-      }
-      console.log(params.join(' : '));
+      var args = Array.prototype.slice.call(arguments);
+      args.unshift("Socky");
+      Function.prototype.apply.apply(console.log, [console, args]);
     }
   },
   is_number: function(obj) {
