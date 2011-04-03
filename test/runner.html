@@ -2,26 +2,24 @@
   "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <title>Socky Test Runner</title>
+  <title>Jasmine Test Runner</title>
+  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.0.2/jasmine.css">
+  <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine.js"></script>
+  <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine-html.js"></script>
+
+  <!-- include source files here... -->
+  <script type="text/javascript" src="../dist/0.5.0-pre/socky.js"></script>
+
+  <!-- include spec files here... -->
+  <script type="text/javascript" src="spec/SockySpec.js"></script>
+
 </head>
-<script type="text/javascript" src="lib/jasmine-0.10.0.js"></script>
-<script type="text/javascript" src="lib/TrivialReporter.js"></script>
-<script type="text/javascript" src="lib/consolex.js"></script>
-<link rel="stylesheet" type="text/css" href="lib/jasmine.css">
-
-<script type="text/javascript">
-  jasmine.include('spec/socky_suite.js', true);
-</script>
-
 <body>
 
 <script type="text/javascript">
-  var jasmineEnv = jasmine.getEnv();
-  jasmineEnv.reporter = new jasmine.TrivialReporter();
-  jasmineEnv.execute();
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().execute();
 </script>
 
 </body>
 </html>
-
-

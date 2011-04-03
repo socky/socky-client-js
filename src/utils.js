@@ -3,7 +3,7 @@ Socky.Utils = {
   log: function() {
     if (console && console.log) {
       var args = Array.prototype.slice.call(arguments);
-      args.unshift("Socky");
+      args.unshift(">> Socky");
       Function.prototype.apply.apply(console.log, [console, args]);
     }
   },

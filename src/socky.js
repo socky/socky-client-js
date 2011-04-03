@@ -42,6 +42,10 @@ this.Socky = Events.extend({
   connect: function() {
     var self = this;
 
+    if (this._connection) {
+      return;
+    }
+
     if (window.WebSocket) {
       var url = this._options.url;
       this.log('connecting', url);
@@ -49,6 +53,19 @@ this.Socky = Events.extend({
       this._connection.onopen = Socky.Utils.bind(this.on_socket_open, this);
       this._connection.onmessage = Socky.Utils.bind(this.on_socket_message, this);
       this._connection.onclose = Socky.Utils.bind(this.on_socket_close, this);
+      this._connection.onerror = Socky.Utils.bind(this.on_socket_error, this);
+      setTimeout(Socky.Utils.bind(function() {
+        if (!this._connection_open) {
+          this._connection = null;
+          // simulate a remote event
+          this.on_socket_message({
+            data: {
+              event: 'socky:connection:error',
+              reason: 'down'
+            }
+          });
+        }
+      }, this), 2000);
     } else {
       this.log('WebSocket unavailable');
       this._connection = {};
@@ -57,6 +74,7 @@ this.Socky = Events.extend({
 
   on_socket_open: function() {
     this.log('connected to socket, waiting for connection_id');
+    this._connection_open = true;
   },
 
   on_socket_message: function(evt) {
@@ -82,6 +100,11 @@ this.Socky = Events.extend({
       }
     }
 
+  },
+
+  on_socket_error: function(evt) {
+    this.log('error', evt.data);
+    this._is_connected = false;
   },
 
   on_socket_close: function() {
@@ -138,12 +161,18 @@ this.Socky = Events.extend({
     return this._channels.find(channel_name);
   },
 
+  close: function() {
+    if (this._connection) {
+      this._connection.close();
+    }
+  },
+
   // private methods
 
   _on_connection_established: function(data) {
     Socky.Utils.log("connection_id", data.connection_id);
     this._connection_id = data.connection_id;
-    this._is_connected = true
+    this._is_connected = true;
     this._subscribe_pending_channels();
   },
 

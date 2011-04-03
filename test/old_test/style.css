@@ -1,3 +1,0 @@
-table td.result { color: white; text-align: center; width: 100px;}
-table td.result.failed { background: red; }
-table td.result.success { background: green; }
