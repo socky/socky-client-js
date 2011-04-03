@@ -138,7 +138,7 @@ this.Socky = Events.extend({
   init: function(url, options) {
 
     if (!Socky.Manager.is_inited()) {
-      Socky.Manager.init(options.assets_location);
+      Socky.Manager.init(options ? options.assets_location : null);
     }
 
     this._options = Socky.Utils.extend({}, Socky.Manager.default_options(), options, {url: url});
