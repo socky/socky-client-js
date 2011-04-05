@@ -8,6 +8,9 @@ map '/socky/auth' do
   app = proc do |env|
     request = Rack::Request.new(env)
     
+    puts request.request_method
+    puts request.params
+    
     payload = JSON.parse(request.params['payload']) rescue {}
     payload = {} unless payload.is_a?(Hash)
     
