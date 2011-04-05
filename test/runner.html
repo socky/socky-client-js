@@ -27,7 +27,7 @@
   }
 
   if (window.WebSocket) {
-    SockyManager.init();
+    Socky.Manager.init();
     setTimeout(startTests, 15000);
   } else {
     startTests();
