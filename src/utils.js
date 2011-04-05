@@ -61,7 +61,6 @@ Socky.Utils = {
     try {
       return JSON.parse(data);
     } catch(e) {
-      Socky.Utils.log("data attribute not valid JSON", "you may wish to implement your own Socky.Manager.parseJSON");
       return data;
     }
   }

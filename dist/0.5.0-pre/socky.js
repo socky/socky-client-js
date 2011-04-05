@@ -198,7 +198,7 @@ this.Socky = Events.extend({
             reason: 'down'
           });
         }
-      }, this), 2000);
+      }, this), 10000);
     } else {
       this.log('WebSocket unavailable');
       this._connection = {};
@@ -217,7 +217,7 @@ this.Socky = Events.extend({
       params.data = Socky.Utils.parseJSON(params.data);
     }
 
-    this.log('received message', params);
+    this.log('received message', JSON.stringify(params));
 
     // first notify internal handlers
     this._trigger('raw', params.event, params);
@@ -283,8 +283,9 @@ this.Socky = Events.extend({
 
   send: function(payload) {
     payload.connection_id = this._connection_id;
-    this.log("sending message", payload);
-    this._connection.send(JSON.stringify(payload));
+    var strigified_params = JSON.stringify(payload);
+    this.log("sending message", strigified_params);
+    this._connection.send(strigified_params);
     return this;
   },
 
@@ -393,7 +394,6 @@ Socky.Utils = {
     try {
       return JSON.parse(data);
     } catch(e) {
-      Socky.Utils.log("data attribute not valid JSON", "you may wish to implement your own Socky.Manager.parseJSON");
       return data;
     }
   }
@@ -597,7 +597,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
   authorize_via_ajax: function(success_callback, failure_callback){
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xhr.open("POST", this._socky.auth_endpoint(), true);
+    var payload = this.generate_auth_payload();
+    xhr.open("GET", this._socky.auth_endpoint() + "?payload=" + JSON.stringify(payload), true);
     xhr.setRequestHeader("Content-Type", "application/json")
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
@@ -605,15 +606,13 @@ Socky.PrivateChannel = Socky.Channel.extend({
           var data = Socky.Utils.parseJSON(xhr.responseText);
           success_callback(data);
         } else {
-          Socky.Utils.log("Couldn't get auth info from your webapp", status);
           failure_callback();
         }
       } else {
         failure_callback();
       }
     };
-    var payload = this.generate_auth_payload();
-    xhr.send(JSON.stringify(payload));
+    xhr.send(null);
   },
 
   authorize_via_jsonp: function(success_callback, failure_callback) {
@@ -641,7 +640,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
       if (!success_called) {
         failure_callback();
       }
-    }, 3000);
+    }, 10000);
 
   }
 

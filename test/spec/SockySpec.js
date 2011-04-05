@@ -10,7 +10,7 @@ describe('Socky Connection', function () {
       socky.bind("socky:connection:established", callback);
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].connection_id).toBeDefined();
@@ -29,7 +29,7 @@ describe('Socky Connection', function () {
       socky.bind("socky:connection:error", callback);
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].reason).toEqual('refused');
@@ -48,7 +48,7 @@ describe('Socky Connection', function () {
       socky.bind("socky:connection:error", callback);
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 5000);
+    waitsFor(function() { return callback.wasCalled; }, 15000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].reason).toEqual('down');
@@ -63,12 +63,19 @@ describe('Socky Connection', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:connection:established", callback);
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 5000);
+
+    runs(function() {
       callback = jasmine.createSpy('Connection closed callback');
       socky.bind("socky:connection:closed", callback);
       socky.close();
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
   });
 
@@ -87,7 +94,7 @@ describe('Socky Public Channel', function () {
       socky.subscribe('test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
@@ -110,7 +117,7 @@ describe('Socky Public Channel', function () {
       socky.subscribe('test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 10000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
@@ -125,12 +132,19 @@ describe('Socky Public Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:connection:established", callback);
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 5000);
+
+    runs(function() {
       callback = jasmine.createSpy('Unsubscribe failure callback');
       socky.bind("socky:unsubscribe:failure", callback);
       socky.unsubscribe('test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('test_channel');
@@ -154,7 +168,7 @@ describe('Socky Private Channel', function () {
       socky.subscribe('private-test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');
@@ -174,7 +188,7 @@ describe('Socky Private Channel', function () {
       socky.subscribe('private-invalid_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('private-invalid_channel');
@@ -197,7 +211,7 @@ describe('Socky Private Channel', function () {
       socky.subscribe('private-test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 10000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');
@@ -212,12 +226,19 @@ describe('Socky Private Channel', function () {
     var socky = new Socky('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
+      callback = jasmine.createSpy('Connection established callback');
+      socky.bind("socky:connection:established", callback);
+    });
+
+    waitsFor(function() { return callback.wasCalled; }, 5000);
+
+    runs(function() {
       callback = jasmine.createSpy('Unsubscribe failure callback');
       socky.bind("socky:unsubscribe:failure", callback);
       socky.unsubscribe('private-test_channel');
     });
 
-    waitsFor(function() { return callback.wasCalled; }, 500);
+    waitsFor(function() { return callback.wasCalled; }, 5000);
 
     runs(function() {
       expect(callback.mostRecentCall.args[0].channel).toEqual('private-test_channel');

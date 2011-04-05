@@ -82,7 +82,7 @@ this.Socky = Events.extend({
       params.data = Socky.Utils.parseJSON(params.data);
     }
 
-    this.log('received message', params);
+    this.log('received message', JSON.stringify(params));
 
     // first notify internal handlers
     this._trigger('raw', params.event, params);
@@ -148,8 +148,9 @@ this.Socky = Events.extend({
 
   send: function(payload) {
     payload.connection_id = this._connection_id;
-    this.log("sending message", payload);
-    this._connection.send(JSON.stringify(payload));
+    var strigified_params = JSON.stringify(payload);
+    this.log("sending message", strigified_params);
+    this._connection.send(strigified_params);
     return this;
   },
 

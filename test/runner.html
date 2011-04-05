@@ -21,8 +21,18 @@
 <body>
 
 <script type="text/javascript">
-  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-  jasmine.getEnv().execute();
+  var startTests = function() {
+    jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+    jasmine.getEnv().execute();
+  }
+
+  if (window.WebSocket) {
+    SockyManager.init();
+    setTimeout(startTests, 15000);
+  } else {
+    startTests();
+  }
+
 </script>
 
 </body>
