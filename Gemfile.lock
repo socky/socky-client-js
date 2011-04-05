@@ -4,9 +4,15 @@ GEM
     closure-compiler (1.0.0)
     jbundle (0.0.8)
       closure-compiler
+    json (1.5.1)
+    ruby-hmac (0.4.0)
+    socky-authenticator (0.5.0.beta3)
+      json
+      ruby-hmac
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   jbundle (~> 0.0.8)
+  socky-authenticator (>= 0.5.0.beta3)
