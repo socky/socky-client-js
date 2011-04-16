@@ -68,9 +68,9 @@ Socky.PrivateChannel = Socky.Channel.extend({
 
     var callback_name = this._name;
     var success_called = false;
-    Socky.Manager._jsonp_auth_callbacks[callback_name] = function() {
+    Socky.Manager._jsonp_auth_callbacks[callback_name] = function(data) {
       success_called = true;
-      success_callback();
+      success_callback(data);
     };
 
     var payload = this.generate_auth_payload();
