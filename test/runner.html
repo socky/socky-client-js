@@ -26,12 +26,7 @@
     jasmine.getEnv().execute();
   }
 
-  if (window.WebSocket) {
-    Socky.Manager.init();
-    setTimeout(startTests, 15000);
-  } else {
-    startTests();
-  }
+  startTests();
 
 </script>
 
