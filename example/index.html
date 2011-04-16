@@ -9,14 +9,7 @@
     <script src="../dist/0.5.0-pre/socky.js" type="text/javascript"></script>
     <script type="text/javascript" charset="utf-8">
       $(document).ready(function() {
-        var socky = new Socky(
-          'ws://localhost:3001/websocket/my_app',
-          {
-            auth_endpoint: 'http://localhost:3002/socky/auth',
-            auth_transport: 'jsonp',
-            assets_location: '../dist/0.5.0-pre/assets'
-          }
-        );
+        var socky = new Socky('ws://localhost:3001/websocket/my_app');
         channel = socky.subscribe("private-chat-channel", {write: true});
 
         channel.bind("chat_message", function(message) {

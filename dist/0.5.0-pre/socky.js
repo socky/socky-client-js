@@ -551,14 +551,14 @@ Socky.Channel = Events.extend({
 
 Socky.PrivateChannel = Socky.Channel.extend({
 
-  init: function(channel_name, socky, permissions) {
+  init: function(channel_name, socky, options) {
     this._super(channel_name, socky);
     var default_permissions = {
       read: true,
       write: false,
       presence: false
     };
-    this._permissions = Socky.Utils.extend({}, default_permissions, permissions);
+    this._permissions = Socky.Utils.extend({}, default_permissions, options);
   },
 
   is_private: function(){
@@ -594,10 +594,18 @@ Socky.PrivateChannel = Socky.Channel.extend({
     return payload;
   },
 
+  generate_auth_payload_string: function() {
+    var params = [];
+    var payload = this.generate_auth_payload();
+    for (var i in payload) {
+      params.push(i + '=' + encodeURIComponent(payload[i]));
+    }
+    return params.join('&');
+  },
+
   authorize_via_ajax: function(success_callback, failure_callback){
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    var payload = this.generate_auth_payload();
     xhr.open("POST", this._socky.auth_endpoint(), true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {
@@ -612,7 +620,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
         failure_callback();
       }
     };
-    xhr.send("payload=" + JSON.stringify(payload));
+    var payload = this.generate_auth_payload_string();
+    xhr.send(payload);
   },
 
   authorize_via_jsonp: function(success_callback, failure_callback) {
@@ -647,10 +656,10 @@ Socky.PrivateChannel = Socky.Channel.extend({
 });
 Socky.PresenceChannel = Socky.PrivateChannel.extend({
 
-  init: function(channel_name, socky, permissions, data) {
-    this._super(channel_name, socky, permissions);
+  init: function(channel_name, socky, options) {
+    this._super(channel_name, socky, options);
     this._members = {};
-    this._subscription_data = data;
+    this._subscription_data = JSON.stringify(options['data']);
     this.bind('socky:member:added', Socky.Utils.bind(this.on_member_added, this));
     this.bind('socky:member:removed', Socky.Utils.bind(this.on_member_removed, this));
   },
