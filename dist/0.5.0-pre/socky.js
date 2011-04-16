@@ -598,8 +598,8 @@ Socky.PrivateChannel = Socky.Channel.extend({
     var self = this;
     var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
     var payload = this.generate_auth_payload();
-    xhr.open("GET", this._socky.auth_endpoint() + "?payload=" + JSON.stringify(payload), true);
-    xhr.setRequestHeader("Content-Type", "application/json")
+    xhr.open("POST", this._socky.auth_endpoint(), true);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4) {
         if (xhr.status == 200) {
@@ -612,7 +612,7 @@ Socky.PrivateChannel = Socky.Channel.extend({
         failure_callback();
       }
     };
-    xhr.send(null);
+    xhr.send("payload=" + JSON.stringify(payload));
   },
 
   authorize_via_jsonp: function(success_callback, failure_callback) {
