@@ -6,7 +6,7 @@ Socky::Authenticator.secret = 'my_secret'
 
 authenticator = proc do |env|
   request = Rack::Request.new(env)
-
+  
   response = Socky::Authenticator.authenticate(request.params, true)
   [ 200, {}, response.to_json ]
 end

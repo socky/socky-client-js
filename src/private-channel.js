@@ -82,12 +82,12 @@ Socky.PrivateChannel = Socky.Channel.extend({
       success_callback(data);
     };
 
-    var payload = this.generate_auth_payload();
+    var payload = this.generate_auth_payload_string();
 
     var full_callback_name = "Socky.Manager._jsonp_auth_callbacks['" + callback_name + "']"
     var script_url = this._socky.auth_endpoint();
     script_url += '?callback=' + encodeURIComponent(full_callback_name);
-    script_url += '&payload=' + encodeURIComponent(JSON.stringify(payload));
+    script_url += '&' + payload;
 
     var script = document.createElement("script");
     script.src = script_url;
