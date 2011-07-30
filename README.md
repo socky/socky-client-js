@@ -9,7 +9,7 @@ Please, include this script into your application code to initialize Socky.
 
 ``` javascript
 // optional, will use the CDN version of the assets as default behaviour
-Socky.Manager.set_assets_location('../dist/0.5.0-pre/assets');
+Socky.Manager.set_assets_location('../dist/0.5.0-beta1/assets');
 
 // optional, you can just setup the options inside each Socky object
 Socky.Manager.set_default_options({
