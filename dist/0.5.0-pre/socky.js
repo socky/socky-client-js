@@ -133,7 +133,9 @@ Events = Class.extend({
   }
 
 });
-this.Socky = Events.extend({
+this.Socky = {};
+
+this.Socky.Client = Events.extend({
 
   init: function(url, options) {
 

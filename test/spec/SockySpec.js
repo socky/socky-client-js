@@ -3,7 +3,7 @@ describe('Socky Connection', function () {
   it('should receive a "socky:connection:established" with a proper connection_id', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
@@ -22,7 +22,7 @@ describe('Socky Connection', function () {
   it('should receive a "socky:connection:error" message with "refused" reason when using a wrong app_id', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/invalid_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/invalid_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection error callback');
@@ -41,7 +41,7 @@ describe('Socky Connection', function () {
   it('should receive a "socky:connection:error" message with "down" reason when using a wrong host', function() {
 
     var callback;
-    var socky = new Socky('ws://example.com:3001/websocket/invalid_app');
+    var socky = new Socky.Client('ws://example.com:3001/websocket/invalid_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection error callback');
@@ -60,7 +60,7 @@ describe('Socky Connection', function () {
   it('should receive a "socky:connection:closed" message when calling .close()', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
@@ -86,7 +86,7 @@ describe('Socky Public Channel', function () {
   it('should receive a "socky:subscribe:success" with a proper channel after subscribing', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Subscribe success callback');
@@ -106,7 +106,7 @@ describe('Socky Public Channel', function () {
   it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Unsubscribe success callback');
@@ -129,7 +129,7 @@ describe('Socky Public Channel', function () {
   it('should receive a "socky:unsubscribe:failure" with a proper channel after tring to unsubscribe from not subscribed channel', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
@@ -160,7 +160,7 @@ describe('Socky Private Channel', function () {
   it('should receive a "socky:subscribe:success" with a proper channel after subscribing', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Subscribe success callback');
@@ -180,7 +180,7 @@ describe('Socky Private Channel', function () {
   it('should receive a "socky:subscribe:failure" with a proper channel if subscribe request was rejected', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Subscribe failure callback');
@@ -200,7 +200,7 @@ describe('Socky Private Channel', function () {
   it('should receive a "socky:unsubscribe:success" with a proper channel after unsubscribing from subscribed channel', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Unsubscribe success callback');
@@ -223,7 +223,7 @@ describe('Socky Private Channel', function () {
   it('should receive a "socky:unsubscribe:failure" with a proper channel after try to unsubscribe from not subscribed channel', function() {
 
     var callback;
-    var socky = new Socky('ws://localhost:3001/websocket/my_app');
+    var socky = new Socky.Client('ws://localhost:3001/websocket/my_app');
 
     runs(function() {
       callback = jasmine.createSpy('Connection established callback');
