@@ -1,7 +1,7 @@
 /*!
  * Socky JavaScript Library
  *
- * @version 0.5.0-pre
+ * @version 0.5.0-beta1
  * @author  Bernard Potocki <bernard.potocki@imanel.org>
  * @author  Stefano Verna <stefano.verna@welaika.com>
  * @licence The MIT licence.
