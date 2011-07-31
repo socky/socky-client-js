@@ -41,7 +41,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     console = {log: function(){ }, error: function(){ }};
   }
   
-  if (!swfobject.hasFlashPlayerVersion("10.0.0")) {
+  // swfobject.hasFlashPlayerVersion("10.0.0") doesn't work with Gnash.
+  if (!swfobject.getFlashPlayerVersion().major >= 10) {
     console.error("Flash Player >= 10.0.0 is required.");
     return;
   }
@@ -55,24 +56,29 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /**
    * This class represents a faux web socket.
    * @param {string} url
-   * @param {string} protocol
+   * @param {array or string} protocols
    * @param {string} proxyHost
    * @param {int} proxyPort
    * @param {string} headers
    */
-  WebSocket = function(url, protocol, proxyHost, proxyPort, headers) {
+  WebSocket = function(url, protocols, proxyHost, proxyPort, headers) {
     var self = this;
     self.__id = WebSocket.__nextId++;
     WebSocket.__instances[self.__id] = self;
     self.readyState = WebSocket.CONNECTING;
     self.bufferedAmount = 0;
     self.__events = {};
+    if (!protocols) {
+      protocols = [];
+    } else if (typeof protocols == "string") {
+      protocols = [protocols];
+    }
     // Uses setTimeout() to make sure __createFlash() runs after the caller sets ws.onopen etc.
     // Otherwise, when onopen fires immediately, onopen is called before it is set.
     setTimeout(function() {
       WebSocket.__addTask(function() {
         WebSocket.__flash.create(
-            self.__id, url, protocol, proxyHost || null, proxyPort || 0, headers || null);
+            self.__id, url, protocols, proxyHost || null, proxyPort || 0, headers || null);
       });
     }, 0);
   };
@@ -171,6 +177,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     if ("readyState" in flashEvent) {
       this.readyState = flashEvent.readyState;
     }
+    if ("protocol" in flashEvent) {
+      this.protocol = flashEvent.protocol;
+    }
     
     var jsEvent;
     if (flashEvent.type == "open" || flashEvent.type == "error") {
@@ -189,7 +198,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   };
   
   WebSocket.prototype.__createSimpleEvent = function(type) {
-    if (window.Event) {
+    if (document.createEvent && window.Event) {
       var event = document.createEvent("Event");
       event.initEvent(type, false, false);
       return event;
@@ -199,7 +208,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   };
   
   WebSocket.prototype.__createMessageEvent = function(type, data) {
-    if (window.MessageEvent && !window.opera) {
+    if (document.createEvent && window.MessageEvent && !window.opera) {
       var event = document.createEvent("MessageEvent");
       event.initMessageEvent("message", false, false, data, null, null, window, null);
       return event;
@@ -245,6 +254,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     if (!window.WEB_SOCKET_SWF_LOCATION) {
       console.error("[WebSocket] set WEB_SOCKET_SWF_LOCATION to location of WebSocketMain.swf");
       return;
+    }
+    if (!WEB_SOCKET_SWF_LOCATION.match(/(^|\/)WebSocketMainInsecure\.swf(\?.*)?$/) &&
+        WEB_SOCKET_SWF_LOCATION.match(/^\w+:\/\/([^\/]+)/)) {
+      var swfHost = RegExp.$1;
+      if (location.host != swfHost) {
+        console.error(
+            "[WebSocket] You must host HTML and WebSocketMain.swf in the same host " +
+            "('" + location.host + "' != '" + swfHost + "'). " +
+            "See also 'How to host HTML file and SWF file in different domains' section " +
+            "in README.md.");
+      }
     }
     var container = document.createElement("div");
     container.id = "webSocketContainer";
