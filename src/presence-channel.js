@@ -4,8 +4,8 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
     this._super(channel_name, socky, options);
     this._members = {};
     this._subscription_data = JSON.stringify(options['data']);
-    this.bind('socky:member:added', Socky.Utils.bind(this.on_member_added, this));
-    this.bind('socky:member:removed', Socky.Utils.bind(this.on_member_removed, this));
+    this.raw_event_bind('socky:member:added', Socky.Utils.bind(this.on_member_added, this));
+    this.raw_event_bind('socky:member:removed', Socky.Utils.bind(this.on_member_removed, this));
   },
 
   disconnect: function(){
@@ -18,18 +18,21 @@ Socky.PresenceChannel = Socky.PrivateChannel.extend({
 
   acknowledge_subscription: function(data) {
     this._super(data);
-    this._members = data.members;
+    for (var i = 0; i < data.members.length; i++) {
+      var member = data.members[i];
+      this._members[member.connection_id] = member.data;
+    }
   },
 
   on_member_added: function(data) {
     this._members[data.connection_id] = data.data;
-    this.trigger('socky:member:added', data.data);
+    this._trigger('public', 'socky:member:added', data.data);
   },
 
   on_member_removed: function(data) {
     var member = this._members[data.connection_id];
     delete this._members[data.connection_id];
-    this.trigger('socky:member:removed', member);
+    this._trigger('public', 'socky:member:removed', member);
   },
 
   generate_subscription_payload: function() {

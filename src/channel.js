@@ -14,6 +14,7 @@ Socky.Channel = Events.extend({
 
   acknowledge_subscription: function(data){
     this._subscribed = true;
+    this._trigger('public', 'socky:subscribe:success', data.members);
   },
 
   is_private: function(){
@@ -66,11 +67,13 @@ Socky.Channel = Events.extend({
   },
 
   receive_event: function(event_name, payload) {
-    // first notify internal handlers
-    this._trigger('raw', payload.event, payload);
-
-    // finally notify the external (client) handlers, passing them just the 'data' param
-    this._trigger('public', payload.event, payload.data);
+    if(payload.event.match(/^socky:/)) {
+      // notify internal handlers
+      this._trigger('raw', payload.event, payload);
+    } else {
+      // notify the external (client) handlers, passing them just the 'data' param
+      this._trigger('public', payload.event, payload.data);
+    }
   },
 
   raw_event_bind: function(event, callback) {
