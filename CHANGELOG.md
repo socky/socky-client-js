@@ -1,5 +1,14 @@
-Changelog
-=========
+# Changelog
+
+## 0.5.0-beta1 / 2011-08-01
+
+Socky was rewritten from scratch. From this version it's based on
+open protocol, and have a lot of new features. Some of them:
+
+- New, standarized communication protocol(it will be easy to implement Socky in other languages)
+- New user authentication process - much faster and more secure
+- Allow users to dynamicly subscribe/unsubscribe from channels
+- New events system - easier to learn and much more powerfull
 
 ## 0.4.2 / 2011-02-03
 
