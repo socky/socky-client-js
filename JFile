@@ -13,18 +13,18 @@ end
 
 bundle 'assets/flashfallback.js' do
   license 'socky-licence.js'
-  license 'web-socket-js-licence.js'
-  file 'web-socket-js/swfobject.js'
-  file 'web-socket-js/web_socket.js'
+  license '../vendor/web-socket-js-licence.js'
+  file '../vendor/web-socket-js/swfobject.js'
+  file '../vendor/web-socket-js/web_socket.js'
 end
 
 bundle 'assets/json2.js' do
-  license 'json-licence.js'
-  file 'json/json2.js'
+  license '../vendor/json-licence.js'
+  file '../vendor/json/json2.js'
 end
 
 # Just copy this file across
-file 'web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
+file '../vendor/web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
 
 # Runs for every bundle and license source.
 filter do |src, config|

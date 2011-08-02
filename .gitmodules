@@ -1,7 +1,7 @@
-[submodule "src/web-socket-js"]
-	path = src/web-socket-js
+[submodule "vendor/json"]
+	path = vendor/json
+	url = git://github.com/douglascrockford/JSON-js.git
+[submodule "vendor/web-socket-js"]
+	path = vendor/web-socket-js
 	url = git://github.com/gimite/web-socket-js.git
 	ignore = dirty
-[submodule "src/json"]
-	path = src/json
-	url = git://github.com/douglascrockford/JSON-js.git
