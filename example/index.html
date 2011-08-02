@@ -12,7 +12,7 @@
         var socky = new Socky.Client(
           'ws://localhost:3001/websocket/my_app',
           {
-            assets_location: '../dist/0.5.0-pre/assets'
+            assets_location: '../dist/0.5.0-beta1/assets'
           }
         );
         channel = socky.subscribe("private-chat-channel", {write: true});
