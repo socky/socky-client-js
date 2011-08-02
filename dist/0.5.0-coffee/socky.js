@@ -6,4 +6,8 @@
  * @licence The MIT licence.
  * @source  http://github.com/socky/socky-client-js
  */
-// TODO
+(function() {
+  alert("socky");
+  alert("socky-client");
+}).call(this);
+
