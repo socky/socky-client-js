@@ -13,7 +13,7 @@ releaseFiles = [
 # All files from which Socky is compiled
 appFiles = [
   'socky'
-  'socky-client'
+  'client'
 ]
 
 # All files from which Flash Fallback is compiled
@@ -36,7 +36,7 @@ task 'release', 'Rebuild and release all scripts to new dist', ->
           licenseContents = replaceConstants licenseContents
           fs.writeFile "#{dir}/#{file}.js", [licenseContents, replaceConstants(fileContents)].join('\n\n'), 'utf8', (err) ->
             throw err if err
-            exec "uglifyjs -nc --no-seqs #{dir}/#{file}.js", (err, stdout, stderr) ->
+            exec "cat #{dir}/#{file}.js | sed s/_use_minified_assets:\\ false/_use_minified_assets:\\ true/ | uglifyjs -nc --no-seqs", (err, stdout, stderr) ->
               throw err if err
               console.log stderr
               minFileContents = stdout
@@ -45,6 +45,7 @@ task 'release', 'Rebuild and release all scripts to new dist', ->
                 copyAssets() if --remaining is 0
   replaceConstants = (string) ->
     str = string.replace /<VERSION>/, version
+    str = str.replace /<ASSETS_LOCATION>/, "http://js.socky.org/#{version}/assets"
   copyAssets = ->
     exec "cp lib/assets/flashfallback.swf #{dir}/assets/flashfallback.swf", (err, stdout, stderr) ->
       throw err if err
@@ -66,7 +67,7 @@ task 'build', 'Rebuild socky.js', ->
         console.log stdout + stderr
         fs.unlink 'lib/socky.coffee', (err) ->
           throw err if err
-          console.log 'Done..'
+          console.log 'Done.'
 
 task 'vendor:build', 'Rebuild all vendored scripts', ->
   invoke 'vendor:flashfallback:build'

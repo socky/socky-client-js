@@ -1,2 +1,0 @@
-# TODO
-alert "socky-client"
