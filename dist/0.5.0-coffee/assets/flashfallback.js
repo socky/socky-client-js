@@ -3,10 +3,10 @@
  *
  * @version 0.5.0-coffee
  * @author  Bernard Potocki <bernard.potocki@imanel.org>
- * @licence The MIT licence.
+ * @license The MIT license.
  * @source  http://github.com/socky/socky-client-js
  *
- * This library contains code with the following licences:
+ * This library contains code with the following licenses:
  *
  * web_socket.js:
  *
@@ -20,6 +20,7 @@
  *   SWFObject v2.2 <http://code.google.com/p/swfobject/>
  *   is released under the MIT License <http://www.opensource.org/licenses/mit-license.php>
  */
+
 
 /*	SWFObject v2.2 <http://code.google.com/p/swfobject/> 
 	is released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
@@ -387,4 +388,3 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   }
   
 })();
-

@@ -1,15 +1,55 @@
 fs     = require 'fs'
 {exec} = require 'child_process'
 
+version = '0.5.0-coffee'
+
+# All files needed for release
+releaseFiles = [
+  'socky'
+  'assets/flashfallback'
+  'assets/json2'
+]
+
+# All files from which Socky is compiled
 appFiles = [
   'socky'
   'socky-client'
 ]
 
+# All files from which Flash Fallback is compiled
 flashFallbackFiles = [
   'vendor/web-socket-js/swfobject'
   'vendor/web-socket-js/web_socket'
 ]
+
+task 'release', 'Rebuild and release all scripts to new dist', ->
+  dir = "dist/#{version}"
+  exec "rm -rf #{dir} && mkdir -p #{dir}/assets", (err, stdout, stderr) ->
+    throw err if err
+    console.log stdout + stderr
+    remaining = releaseFiles.length
+    for file, index in releaseFiles then do (file, index) ->
+      fs.readFile "lib/#{file}.js", 'utf8', (err, fileContents) ->
+        throw err if err
+        fs.readFile "lib/#{file}-license.js", 'utf8', (err, licenseContents) ->
+          throw err if err
+          licenseContents = replaceConstants licenseContents
+          fs.writeFile "#{dir}/#{file}.js", [licenseContents, replaceConstants(fileContents)].join('\n\n'), 'utf8', (err) ->
+            throw err if err
+            exec "uglifyjs -nc --no-seqs #{dir}/#{file}.js", (err, stdout, stderr) ->
+              throw err if err
+              console.log stderr
+              minFileContents = stdout
+              fs.writeFile "#{dir}/#{file}.min.js", [licenseContents, minFileContents].join(''), 'utf8', (err) ->
+                throw err if err
+                copyAssets() if --remaining is 0
+  replaceConstants = (string) ->
+    str = string.replace /<VERSION>/, version
+  copyAssets = ->
+    exec "cp lib/assets/flashfallback.swf #{dir}/assets/flashfallback.swf", (err, stdout, stderr) ->
+      throw err if err
+      console.log stdout + stderr
+      console.log 'Done.'
 
 task 'build', 'Rebuild socky.js', ->
   appContents = new Array remaining = appFiles.length
@@ -26,7 +66,7 @@ task 'build', 'Rebuild socky.js', ->
         console.log stdout + stderr
         fs.unlink 'lib/socky.coffee', (err) ->
           throw err if err
-          console.log 'Done.'
+          console.log 'Done..'
 
 task 'vendor:build', 'Rebuild all vendored scripts', ->
   invoke 'vendor:flashfallback:build'
