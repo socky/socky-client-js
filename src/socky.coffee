@@ -30,7 +30,7 @@ window.Socky =
     else
       success_callback()
   
-  log: (args...) -> console.log "Socky : #{args.join " : "}" if @debug
+  log: (args...) -> console.log "Socky : #{args.join " : "}" if @debug and console?
   
   _assets_extension: -> if @_use_minified_assets then 'min.js' else 'js'
   
