@@ -719,7 +719,7 @@ Socky.Manager = {
   _is_websocket_driver_loaded: false,
   _jsonp_auth_callbacks: {},
   _socky_instances: [],
-  _assets_location: 'http://js.socky.org/v0.5-beta1/assets',
+  _assets_location: 'http://js.socky.org/0.5.0-beta1/assets',
   _flash_debug: false,
   _default_options: {
     debug: false,
