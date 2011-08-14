@@ -40,7 +40,7 @@ file 'web-socket-js/WebSocketMainInsecure.swf' => 'assets/WebSocketMain.swf'
 # Runs for every bundle and license source.
 filter do |src, config|
   src = src.gsub /<VERSION>/, config.version.to_s
-  src = src.gsub /<ASSETS_LOCATION>/, "http://js.socky.org/#{version}/assets"
+  src = src.gsub /<ASSETS_LOCATION>/, "http://js.socky.org/v#{version}/assets"
 end
 
 # some_dependency.js
