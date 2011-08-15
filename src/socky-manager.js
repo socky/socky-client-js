@@ -79,6 +79,7 @@ Socky.Manager = {
       // Don't let WebSockets.js initialize on load. Inconsistent accross browsers.
       window.WEB_SOCKET_SWF_LOCATION = this._assets_location + "/WebSocketMain.swf";
       window.WEB_SOCKET_DEBUG = this._flash_debug;
+      window.WEB_SOCKET_SUPPRESS_CROSS_DOMAIN_SWF_ERROR = true;
 
       scripts_to_require.push(this._assets_location + '/flashfallback<DEPENDENCY_SUFFIX>.js');
     }
