@@ -182,11 +182,15 @@ this.Socky.Client = Events.extend({
     if (this._connection) {
       return;
     }
-
-    if (window.WebSocket) {
-      var url = this._options.url;
-      this.log('connecting', url);
+    var url = this._options.url;
+    if ('WebSocket' in window) {
       this._connection = new WebSocket(url);
+    } else if ('MozWebSocket' in window) {
+      this._connection = new MozWebSocket(url);
+    }
+    if (this._connection) {
+      
+      this.log('connecting', url);
       this._connection.onopen = Socky.Utils.bind(this.on_socket_open, this);
       this._connection.onmessage = Socky.Utils.bind(this.on_socket_message, this);
       this._connection.onclose = Socky.Utils.bind(this.on_socket_close, this);
@@ -786,7 +790,7 @@ Socky.Manager = {
     }
 
     // Check for Flash fallback dep. Wrap initialization.
-    if (window['WebSocket'] == undefined) {
+    if (window['WebSocket'] == undefined && window['MozWebSocket'] == undefined) {
 
       Socky.Utils.log("no WebSocket driver available, requiring it");
 
