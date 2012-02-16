@@ -7,7 +7,7 @@ You can copy all files from directory of specific version('dist' subdirectories)
 In your header you only need to link main file - socky.js or socky.min.js.
 
 ``` html
-<script src="http://js.socky.org/v0.5.0-beta1/socky.min.js" type="text/javascript"></script>
+<script src="http://js.socky.org/v0.5.0/socky.min.js" type="text/javascript"></script>
 ```
 
 ## Basic usage

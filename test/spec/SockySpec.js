@@ -254,7 +254,7 @@ describe('Socky Private Channel', function () {
     //// Presence channel
 
     // presence_subscribe_success
-    var socky_presence_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0-beta1/assets'});
+    var socky_presence_subscribe_success = new Socky('ws://localhost:3001/websocket/my_app', {assets_location: '../dist/0.5.0/assets'});
     socky_presence_subscribe_success.bind("socky:subscribe:success", function(payload) {
       if(payload.channel == 'presence-presence_subscribe_success') {
         pass('presence_subscribe_success');
