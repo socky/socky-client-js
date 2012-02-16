@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 / 2012-02-16
+
+Mostly small bugfixes. This is stable release after several months of testing by big companies.
+
 ## 0.5.0-beta1 / 2011-08-01
 
 Socky was rewritten from scratch. From this version it's based on
